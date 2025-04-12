@@ -7,30 +7,23 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name ="users")
 @Getter
+@Setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(length = 5,unique = true,nullable = false)
-    private String nametag;
 
     @Column(nullable = false, length = 10)
     private String firstName;
 
     @Column(nullable = false, length = 10)
     private String lastName;
-
-    @Column(length = 20, unique = true,nullable = false)
-    private String email;
-
-    @Column(length = 15, unique = true,nullable = false)
-    private String phoneNumber;
 
     @Column(length = 20, unique = true,nullable = false)
     private String username;
@@ -46,6 +39,12 @@ public class User {
     private Timestamp createdAt;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-    private Set<Post> posts;
+    private Set<Post> posts = new HashSet<>();
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
 
 }
+
+
