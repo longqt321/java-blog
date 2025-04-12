@@ -12,6 +12,7 @@ public class PostMapper {
                 post.getTitle(),
                 post.getBody(),
                 UserMapper.toDTO(post.getAuthor()),
+                post.getStatus(),
                 post.getCreatedAt(),
                 HashtagMapper.toDTOList(post.getHashtags())
         );

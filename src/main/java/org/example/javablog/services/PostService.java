@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class PostService {
@@ -19,13 +20,18 @@ public class PostService {
         return PostMapper.toDTOList(blogRepository.findAll());
     }
 
-    public Post getPostById(Long id) {
-        return blogRepository.findById(id).orElse(null);
+    public PostDTO getPostById(Long id) {
+        return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
     public Post createPost(Post post) {
-        System.out.println("Post service:");
-        System.out.println(post);
-        System.out.println(post.getAuthor());
         return blogRepository.save(post);
+    }
+    public PostDTO updatePost(Long id,Post post){
+        Post updatedPost = blogRepository.findById(id).orElseThrow(NullPointerException::new);
+        updatedPost.setTitle(post.getTitle());
+        updatedPost.setBody(post.getBody());
+        updatedPost.setHashtags(post.getHashtags());
+        updatedPost.setStatus(post.getStatus());
+        return PostMapper.toDTO(blogRepository.save(updatedPost));
     }
 }

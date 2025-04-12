@@ -46,6 +46,3 @@ public class Post {
 
 }
 
-enum Status{
-    PUBLIC, PRIVATE
-}

@@ -19,6 +19,6 @@ public class UserService {
         return UserMapper.toDTOList(userRepository.findAll());
     }
     public UserDTO getUserById(Long id) {
-        return UserMapper.toDTO(userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found")));
+        return UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
     }
 }

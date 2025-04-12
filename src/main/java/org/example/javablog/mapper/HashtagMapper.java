@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 public class HashtagMapper {
     public static HashtagDTO toDTO(Hashtag hashtag) {
         return new HashtagDTO(
-                hashtag.getId(),
                 hashtag.getName()
         );
     }

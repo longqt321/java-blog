@@ -28,8 +28,8 @@ public class UserController {
         try{
             UserDTO user = userService.getUserById(id);
             return ResponseEntity.ok(user);
-        }catch(RuntimeException e){
-            return ResponseEntity.notFound().build();
+        }catch(NullPointerException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 }
