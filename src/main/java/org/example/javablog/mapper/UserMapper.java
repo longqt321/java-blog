@@ -20,4 +20,15 @@ public class UserMapper {
     public static List<UserDTO> toDTOList(List<User> users) {
         return users.stream().map(UserMapper::toDTO).toList();
     }
+    public static User toEntity(UserDTO userDTO) {
+        User user = new User();
+        user.setId(userDTO.getId());
+        user.setFirstName(userDTO.getFirstName());
+        user.setLastName(userDTO.getLastName());
+        user.setUsername(userDTO.getUsername());
+        user.setDescription(userDTO.getDescription());
+        user.setRole(userDTO.getRole());
+        user.setCreatedAt(userDTO.getCreatedAt());
+        return user;
+    }
 }

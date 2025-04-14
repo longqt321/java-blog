@@ -1,7 +1,7 @@
 package org.example.javablog.services;
 
 import org.example.javablog.dto.PostDTO;
-import org.example.javablog.mapper.HashtagMapper;
+import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
 import org.example.javablog.repository.PostRepository;
@@ -28,16 +28,24 @@ public class PostService {
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
-    public Post createPost(Post post) {
-        return blogRepository.save(post);
+    public PostDTO createPost(PostDTO postDTO) {
+        Post newPost = new Post();
+        newPost.setTitle(postDTO.getTitle());
+        newPost.setBody(postDTO.getBody());
+        newPost.setStatus(postDTO.getStatus());
+        newPost.setAuthor(UserMapper.toEntity(postDTO.getAuthor()));
+        newPost.setHashtags(postDTO.getHashtags().stream()
+                .map(hashtagName -> hashtagService.getOrCreateHashtag(hashtagName))
+                .collect(Collectors.toSet()));
+        return PostMapper.toDTO(blogRepository.save(newPost));
     }
-    public PostDTO updatePost(Long id,PostDTO post){
+    public PostDTO updatePost(Long id,PostDTO postDTO){
         Post updatedPost = blogRepository.findById(id).orElseThrow(NullPointerException::new);
-        updatedPost.setTitle(post.getTitle());
-        updatedPost.setBody(post.getBody());
-        updatedPost.setStatus(post.getStatus());
+        updatedPost.setTitle(postDTO.getTitle());
+        updatedPost.setBody(postDTO.getBody());
+        updatedPost.setStatus(postDTO.getStatus());
 
-        updatedPost.setHashtags(post.getHashtags().stream()
+        updatedPost.setHashtags(postDTO.getHashtags().stream()
                 .map(hashtagName-> hashtagService.getOrCreateHashtag(hashtagName))
                 .collect(Collectors.toSet()));
 

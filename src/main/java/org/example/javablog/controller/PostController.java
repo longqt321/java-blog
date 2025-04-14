@@ -31,8 +31,8 @@ public class PostController {
         }
     }
     @PostMapping("/create")
-    public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        Post createdPost = postService.createPost(post);
+    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO post) {
+        PostDTO createdPost = postService.createPost(post);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }
     @PutMapping("/{id}")
