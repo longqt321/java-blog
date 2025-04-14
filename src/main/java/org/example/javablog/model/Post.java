@@ -36,7 +36,7 @@ public class Post {
     @CreationTimestamp
     private Timestamp createdAt;
 
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "post_hashtags",
             joinColumns = @JoinColumn(name = "post_id"),

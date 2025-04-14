@@ -1,9 +1,12 @@
 package org.example.javablog.mapper;
 
 import org.example.javablog.dto.PostDTO;
+import org.example.javablog.model.Hashtag;
 import org.example.javablog.model.Post;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class PostMapper {
     public static PostDTO toDTO(Post post) {
@@ -14,10 +17,15 @@ public class PostMapper {
                 UserMapper.toDTO(post.getAuthor()),
                 post.getStatus(),
                 post.getCreatedAt(),
-                HashtagMapper.toDTOList(post.getHashtags())
+                getHashtagNames(post.getHashtags())
         );
     }
     public static List<PostDTO> toDTOList(List<Post> posts) {
         return posts.stream().map(PostMapper::toDTO).toList();
+    }
+    private static Set<String> getHashtagNames(Set<Hashtag> hashtags) {
+        return hashtags.stream()
+                .map(Hashtag::getName)
+                .collect(Collectors.toSet());
     }
 }

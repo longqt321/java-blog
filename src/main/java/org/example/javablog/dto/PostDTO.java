@@ -18,5 +18,5 @@ public class PostDTO {
     private UserDTO author;
     private Status status;
     private Timestamp createdAt;
-    private Set<HashtagDTO> hashtags;
+    private Set<String> hashtags;
 }
