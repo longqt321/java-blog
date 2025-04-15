@@ -21,6 +21,9 @@ public class PostService {
     @Autowired
     private HashtagService hashtagService;
 
+    @Autowired
+    private UserService userService;
+
     public List<PostDTO> getPosts(){
         return PostMapper.toDTOList(blogRepository.findAll());
     }
@@ -33,7 +36,9 @@ public class PostService {
         newPost.setTitle(postDTO.getTitle());
         newPost.setBody(postDTO.getBody());
         newPost.setStatus(postDTO.getStatus());
-        newPost.setAuthor(UserMapper.toEntity(postDTO.getAuthor()));
+        newPost.setAuthor(UserMapper.toEntity(
+                userService.getUserById(postDTO.getAuthor().getId())
+        ));
         newPost.setHashtags(postDTO.getHashtags().stream()
                 .map(hashtagName -> hashtagService.getOrCreateHashtag(hashtagName))
                 .collect(Collectors.toSet()));
