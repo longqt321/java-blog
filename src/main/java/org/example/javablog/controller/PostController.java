@@ -44,5 +44,17 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, @RequestParam Long userId) {
+        try {
+            postService.deletePost(postId, userId);
+            return ResponseEntity.noContent().build();
+        }
+        catch (SecurityException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }

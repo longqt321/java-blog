@@ -2,6 +2,7 @@ package org.example.javablog.services;
 
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.mapper.UserMapper;
+import org.example.javablog.model.Role;
 import org.example.javablog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,5 +21,10 @@ public class UserService {
     }
     public UserDTO getUserById(Long id) {
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
+    }
+    public boolean isAdmin(Long userID){
+        return userRepository.findById(userID)
+                .map(user -> user.getRole() == Role.ROLE_ADMIN)
+                .orElse(false);
     }
 }
