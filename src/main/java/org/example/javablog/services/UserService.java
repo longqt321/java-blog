@@ -24,9 +24,6 @@ public class UserService {
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
     }
     public void deleteUser(Long deletedUserId, Long userId) {
-        if (deletedUserId == null || userId == null) {
-            throw new NullPointerException();
-        }
         User user = userRepository.findById(deletedUserId).orElseThrow(NullPointerException::new);
         if (!deletedUserId.equals(userId) && !isAdmin(userId)) {
             throw new SecurityException("You are not unauthorized to delete this user");
