@@ -4,20 +4,20 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.io.Serializable;
 import java.security.Timestamp;
 
 @Entity
 @Table (name = "block_relationship")
-@IdClass(BlockId.class)
+@Data
 public class BlockRelationship {
-
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name="blocking_user_id",nullable = false)
     private User blocking_user;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "blocked_user_id",nullable = false)
     private User blocked_user;
@@ -27,8 +27,3 @@ public class BlockRelationship {
     private Timestamp created_at;
 }
 
-@Data
-class BlockId implements Serializable {
-    private Long blocking_user;
-    private Long blocked_user;
-}
