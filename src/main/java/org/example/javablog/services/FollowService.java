@@ -27,9 +27,9 @@ public class FollowService {
         followRepository.save(followRelationship);
     }
     @Transactional
-    public void unFollowUser(Long followingUserId,Long followedUserId){
-       User followingUser = UserMapper.toEntity(userService.getUserById(followingUserId));
-       User followedUser = UserMapper.toEntity(userService.getUserById(followedUserId));
-       followRepository.deleteByFollowingUserAndFollowedUser(followingUser,followedUser);
+    public void unFollowUser(Long unfollowingUserId,Long unfollowedUserId){
+       User unfollowingUser = UserMapper.toEntity(userService.getUserById(unfollowingUserId));
+       User unfollowedUser = UserMapper.toEntity(userService.getUserById(unfollowedUserId));
+       followRepository.deleteByFollowingUserAndFollowedUser(unfollowingUser,unfollowedUser);
     }
 }
