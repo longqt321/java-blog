@@ -16,14 +16,14 @@ public class BlockRelationship {
 
     @ManyToOne
     @JoinColumn(name="blocking_user_id",nullable = false)
-    private User blocking_user;
+    private User blockingUser;
 
     @ManyToOne
     @JoinColumn(name = "blocked_user_id",nullable = false)
-    private User blocked_user;
+    private User blockedUser;
 
     @Column(updatable = false)
     @CreationTimestamp
-    private Timestamp created_at;
+    private Timestamp createdAt;
 }
 
