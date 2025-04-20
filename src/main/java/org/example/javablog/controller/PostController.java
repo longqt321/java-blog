@@ -2,13 +2,15 @@ package org.example.javablog.controller;
 
 
 import org.example.javablog.dto.PostDTO;
-import org.example.javablog.model.Post;
+import org.example.javablog.dto.UserDTO;
 import org.example.javablog.services.PostService;
+import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -16,6 +18,9 @@ import java.util.List;
 public class PostController {
     @Autowired
     private PostService postService;
+
+    @Autowired
+    private UserService userService;
 
     @GetMapping
     public List<PostDTO> getAllPosts() {
@@ -30,8 +35,11 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-    @PostMapping("/")
-    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO post) {
+    @PostMapping("")
+    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO post, Principal principal) {
+        UserDTO user = userService.getUserByUsername(principal.getName());
+        post.setAuthor(user);
+        System.out.println(user);
         PostDTO createdPost = postService.createPost(post);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
     }

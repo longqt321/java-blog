@@ -31,14 +31,16 @@ public class PostService {
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
+    public List<PostDTO> getRecommendedPosts(Long userId) {
+        List<Post> posts = blogRepository.findAll();
+        return PostMapper.toDTOList(posts);
+    }
     public PostDTO createPost(PostDTO postDTO) {
         Post newPost = new Post();
         newPost.setTitle(postDTO.getTitle());
         newPost.setBody(postDTO.getBody());
         newPost.setStatus(postDTO.getStatus());
-        newPost.setAuthor(UserMapper.toEntity(
-                userService.getUserById(postDTO.getAuthor().getId())
-        ));
+        newPost.setAuthor(UserMapper.toEntity(postDTO.getAuthor()));
         newPost.setHashtags(postDTO.getHashtags().stream()
                 .map(hashtagName -> hashtagService.getOrCreateHashtag(hashtagName))
                 .collect(Collectors.toSet()));
