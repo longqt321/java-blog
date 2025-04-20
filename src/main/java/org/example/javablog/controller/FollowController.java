@@ -1,7 +1,5 @@
 package org.example.javablog.controller;
 
-import org.example.javablog.dto.FollowRequest;
-import org.example.javablog.model.FollowRelationship;
 import org.example.javablog.services.FollowService;
 import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +32,7 @@ public class FollowController {
     public ResponseEntity<Void> unfollowUser(@PathVariable Long unfollowedUserId, Principal principal) {
         String currentUsername = principal.getName();
         Long unfollowingUserId = userService.getUserByUsername(currentUsername).getId();
-        if (!Objects.equals(unfollowingUserId,unfollowedUserId)){
-            followService.unFollowUser(unfollowingUserId,unfollowedUserId);
-        }
+        followService.unfollowUser(unfollowingUserId,unfollowedUserId);
         return ResponseEntity.ok().build();
     }
 }

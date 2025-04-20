@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.javablog.model.User;
 
+import java.util.Objects;
+
 @Service
 public class FollowService {
     @Autowired
@@ -16,6 +18,9 @@ public class FollowService {
     private UserService userService;
 
     public void followUser(Long followingUserId,Long followedUserId){
+        if (Objects.equals(followingUserId,followedUserId)){
+            return;
+        }
         User followingUser = UserMapper.toEntity(userService.getUserById(followingUserId));
         User followedUser = UserMapper.toEntity(userService.getUserById(followedUserId));
         if (followRepository.existsByFollowingUserAndFollowedUser(followingUser, followedUser)) {
@@ -27,7 +32,10 @@ public class FollowService {
         followRepository.save(followRelationship);
     }
     @Transactional
-    public void unFollowUser(Long unfollowingUserId,Long unfollowedUserId){
+    public void unfollowUser(Long unfollowingUserId,Long unfollowedUserId){
+        if (Objects.equals(unfollowingUserId,unfollowedUserId)){
+            return;
+        }
        User unfollowingUser = UserMapper.toEntity(userService.getUserById(unfollowingUserId));
        User unfollowedUser = UserMapper.toEntity(userService.getUserById(unfollowedUserId));
        followRepository.deleteByFollowingUserAndFollowedUser(unfollowingUser,unfollowedUser);
