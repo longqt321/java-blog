@@ -1,34 +1,34 @@
 package org.example.javablog.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.io.Serializable;
-import java.security.Timestamp;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table (name = "follow_relationship")
-@IdClass(FollowId.class)
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class FollowRelationship {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name="following_user_id",nullable = false)
-    private User following_user;
+    private User followingUser;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "followed_user_id",nullable = false)
-    private User followed_user;
+    private User followedUser;
 
     @Column(updatable = false)
     @CreationTimestamp
-    private Timestamp created_at;
-}
-
-@Data
-class FollowId implements Serializable {
-    private Long following_user;
-    private Long followed_user;
+    private Timestamp createdAt;
 }

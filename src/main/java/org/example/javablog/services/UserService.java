@@ -23,6 +23,9 @@ public class UserService {
     public UserDTO getUserById(Long id) {
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
     }
+    public UserDTO getUserByUsername(String username){
+        return UserMapper.toDTO(Objects.requireNonNull(userRepository.findByUsername(username).orElse(null)));
+    }
     public void deleteUser(Long deletedUserId, Long userId) {
         User user = userRepository.findById(deletedUserId).orElseThrow(NullPointerException::new);
         if (!deletedUserId.equals(userId) && !isAdmin(userId)) {
