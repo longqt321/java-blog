@@ -37,7 +37,7 @@ public class PostMapper {
                 UserMapper.toEntity(post.getAuthor()),
                 post.getStatus(),
                 post.getCreatedAt(),
-                HashtagMapper.toEntityListFromName(post.getHashtags())
+                HashtagMapper.toEntitySetFromName(post.getHashtags())
         );
     }
 }

@@ -1,11 +1,15 @@
 package org.example.javablog.services;
 
+import org.example.javablog.dto.HashtagDTO;
+import org.example.javablog.mapper.HashtagMapper;
 import org.example.javablog.model.Hashtag;
 import org.example.javablog.repository.HashtagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class HashtagService {
@@ -20,5 +24,11 @@ public class HashtagService {
             newHashtag.setName(normalizedName);
             return hashtagRepository.save(newHashtag);
         });
+    }
+    public List<String> getPopularHashtagNames(){
+        List<Hashtag> hashtags = hashtagRepository.findPopularHashtags();
+        return hashtags.stream()
+                .map(Hashtag::getName)
+                .toList();
     }
 }
