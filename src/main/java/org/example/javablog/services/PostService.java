@@ -44,7 +44,18 @@ public class PostService {
         )).collect(Collectors.toList());
     }
     public List<PostDTO> getPostsByUserId(Long userId) {
-        return PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
+        List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
+        Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
+        return posts.stream().map(post -> new PostDTO(
+                post.getId(),
+                post.getTitle(),
+                post.getBody(),
+                post.getAuthor(),
+                post.getStatus(),
+                post.getCreatedAt(),
+                post.getHashtags(),
+                likedPostIds.contains(post.getId())
+        )).collect(Collectors.toList());
     }
 
     public PostDTO getPostById(Long id) {
