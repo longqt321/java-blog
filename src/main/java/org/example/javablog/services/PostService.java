@@ -8,6 +8,7 @@ import org.example.javablog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -24,8 +25,17 @@ public class PostService {
     @Autowired
     private UserService userService;
 
-    public List<PostDTO> getPosts(){
-        return PostMapper.toDTOList(blogRepository.findAll());
+    public List<PostDTO> getPosts(Long userId){
+        List<Object[]> results = blogRepository.findAllWithLikeStatus(userId);
+        return results.stream()
+                .map(result -> {
+                    Post post = (Post) result[0];
+                    boolean liked = (boolean) result[1];
+                    PostDTO postDTO = PostMapper.toDTO(post);
+                    postDTO.setLiked(liked);
+                    return postDTO;
+                })
+                .collect(Collectors.toList());
     }
 
     public PostDTO getPostById(Long id) {
@@ -63,7 +73,6 @@ public class PostService {
 
         blogRepository.delete(post);
     }
-
     public List<PostDTO> getPostsByUserId(Long userId) {
         return PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
     }

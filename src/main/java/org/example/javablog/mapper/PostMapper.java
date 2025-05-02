@@ -17,7 +17,8 @@ public class PostMapper {
                 UserMapper.toDTO(post.getAuthor()),
                 post.getStatus(),
                 post.getCreatedAt(),
-                getHashtagNames(post.getHashtags())
+                getHashtagNames(post.getHashtags()),
+                false
         );
     }
     public static List<PostDTO> toDTOList(List<Post> posts) {

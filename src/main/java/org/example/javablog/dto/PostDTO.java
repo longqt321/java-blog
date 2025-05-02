@@ -19,4 +19,5 @@ public class PostDTO {
     private Status status;
     private Timestamp createdAt;
     private Set<String> hashtags;
+    private boolean liked;
 }

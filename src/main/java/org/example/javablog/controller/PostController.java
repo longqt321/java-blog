@@ -23,8 +23,9 @@ public class PostController {
     private UserService userService;
 
     @GetMapping
-    public List<PostDTO> getAllPosts() {
-        return postService.getPosts();
+    public List<PostDTO> getAllPosts(Principal principal) {
+        UserDTO user = userService.getUserByUsername(principal.getName());
+        return postService.getPosts(user.getId());
     }
     @GetMapping({"/{id}"})
     public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
