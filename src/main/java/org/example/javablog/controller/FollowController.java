@@ -32,7 +32,9 @@ public class FollowController {
     public ResponseEntity<Void> unfollowUser(@PathVariable Long unfollowedUserId, Principal principal) {
         String currentUsername = principal.getName();
         Long unfollowingUserId = userService.getUserByUsername(currentUsername).getId();
-        followService.unfollowUser(unfollowingUserId,unfollowedUserId);
+        if (!Objects.equals(unfollowingUserId, unfollowedUserId)){
+            followService.unfollowUser(unfollowingUserId, unfollowedUserId);
+        }
         return ResponseEntity.ok().build();
     }
 }
