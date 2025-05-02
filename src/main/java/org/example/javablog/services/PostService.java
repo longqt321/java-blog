@@ -4,6 +4,7 @@ import org.example.javablog.dto.PostDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
+import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,18 +26,25 @@ public class PostService {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private LikeRepository likeRepository;
 
     public List<PostDTO> getPosts(Long userId){
-        List<Object[]> results = blogRepository.findAllWithLikeStatus(userId);
-        return results.stream()
-                .map(result -> {
-                    Post post = (Post) result[0];
-                    boolean liked = (boolean) result[1];
-                    PostDTO postDTO = PostMapper.toDTO(post);
-                    postDTO.setLiked(liked);
-                    return postDTO;
-                })
-                .collect(Collectors.toList());
+        List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findAll());
+        Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
+        return posts.stream().map(post -> new PostDTO(
+                post.getId(),
+                post.getTitle(),
+                post.getBody(),
+                post.getAuthor(),
+                post.getStatus(),
+                post.getCreatedAt(),
+                post.getHashtags(),
+                likedPostIds.contains(post.getId())
+        )).collect(Collectors.toList());
+    }
+    public List<PostDTO> getPostsByUserId(Long userId) {
+        return PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
     }
 
     public PostDTO getPostById(Long id) {
@@ -73,7 +82,5 @@ public class PostService {
 
         blogRepository.delete(post);
     }
-    public List<PostDTO> getPostsByUserId(Long userId) {
-        return PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
-    }
+
 }

@@ -18,7 +18,7 @@ public class PostMapper {
                 post.getStatus(),
                 post.getCreatedAt(),
                 getHashtagNames(post.getHashtags()),
-                false
+                false // Default value - Always need to be set later <- Unable to create this method without it.
         );
     }
     public static List<PostDTO> toDTOList(List<Post> posts) {
