@@ -18,7 +18,7 @@ import java.util.List;
 public class PostController {
     @Autowired
     private PostService postService;
-
+ 
     @Autowired
     private UserService userService;
 
@@ -32,6 +32,15 @@ public class PostController {
             PostDTO post = postService.getPostById(id);
             return ResponseEntity.ok(post);
         } catch(NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<PostDTO>> getPostsByUserId(@PathVariable Long userId) {
+        try {
+            List<PostDTO> posts = postService.getPostsByUserId(userId);
+            return ResponseEntity.ok(posts);
+        } catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

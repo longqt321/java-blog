@@ -31,10 +31,6 @@ public class PostService {
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
-    public List<PostDTO> getRecommendedPosts(Long userId) {
-        List<Post> posts = blogRepository.findAll();
-        return PostMapper.toDTOList(posts);
-    }
     public PostDTO createPost(PostDTO postDTO) {
         Post newPost = new Post();
         newPost.setTitle(postDTO.getTitle());
@@ -66,5 +62,9 @@ public class PostService {
         }
 
         blogRepository.delete(post);
+    }
+
+    public List<PostDTO> getPostsByUserId(Long userId) {
+        return PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
     }
 }

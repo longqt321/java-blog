@@ -17,9 +17,6 @@ public class HashtagMapper {
                 hashtag.getName()
         );
     }
-    public static Set<HashtagDTO> toDTOList(Set<Hashtag> hashtags) {
-        return hashtags.stream().map(HashtagMapper::toDTO).collect(Collectors.toSet());
-    }
     public static Hashtag toEntity(HashtagDTO hashtagDTO) {
         String normalizedName = hashtagDTO.getName()
                 .replace(" ","")
@@ -28,7 +25,25 @@ public class HashtagMapper {
                 normalizedName,
                 new HashSet<Post>());
     }
-    public static Set<Hashtag> toEntityList(Set<HashtagDTO> hashtagDTOs) {
+    public static String toString(Hashtag hashtag) {
+        return hashtag.getName();
+    }
+    public static Set<HashtagDTO> toDTOList(Set<Hashtag> hashtags) {
+        return hashtags.stream().map(HashtagMapper::toDTO).collect(Collectors.toSet());
+    }
+
+    public static Set<Hashtag> toEntityListFromDTO(Set<HashtagDTO> hashtagDTOs) {
         return hashtagDTOs.stream().map(HashtagMapper::toEntity).collect(Collectors.toSet());
     }
+    public static Set<Hashtag> toEntityListFromName(Set<String> hashtagNames) {
+        return hashtagNames.stream()
+                .map(name -> new Hashtag(null, name, new HashSet<>()))
+                .collect(Collectors.toSet());
+    }
+    public static Set<String> toStringList(Set<HashtagDTO> hashtagDTOs) {
+        return hashtagDTOs.stream()
+                .map(HashtagDTO::getName)
+                .collect(Collectors.toSet());
+    }
+
 }

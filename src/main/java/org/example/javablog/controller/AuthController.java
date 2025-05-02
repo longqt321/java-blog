@@ -7,6 +7,8 @@ import org.example.javablog.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -17,22 +19,11 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-
-    @GetMapping("/")
-    public String index(){
-        return "Test api";
-    }
-    @GetMapping("/testroute")
-    public String test(){
-
-        return "Test route";
-    }
-
     @CrossOrigin
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request, HttpServletResponse response){
         try{
-            LoginResponse authResponse = authService.login(request);
+            AuthResponse authResponse = authService.login(request);
 
             Cookie cookie = new Cookie("refresh_token", authResponse.getRefreshToken());
             cookie.setHttpOnly(true);
@@ -41,9 +32,12 @@ public class AuthController {
             cookie.setSecure(true); // Set to true if using HTTPS
             response.addCookie(cookie);
 
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Auth: " + auth.getAuthorities());
+
             return ResponseEntity
                     .status(HttpStatus.OK)
-                    .body(new TokenResponse(authResponse.getAccessToken()));
+                    .body(new LoginResponse(authResponse.getAccessToken(),authResponse.getUser()));
         }catch(RuntimeException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)

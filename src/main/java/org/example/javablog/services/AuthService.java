@@ -1,9 +1,10 @@
 package org.example.javablog.services;
 
 import org.example.javablog.dto.LoginRequest;
-import org.example.javablog.dto.LoginResponse;
+import org.example.javablog.dto.AuthResponse;
 import org.example.javablog.dto.RegisterRequest;
 import org.example.javablog.dto.RegisterResponse;
+import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.model.Role;
 import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
@@ -14,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.security.PublicKey;
 import java.util.Optional;
 
 @Service
@@ -40,7 +40,7 @@ public class AuthService {
 
         return new RegisterResponse("Register successfully");
     }
-    public LoginResponse login(LoginRequest request){
+    public AuthResponse login(LoginRequest request){
         if (!userRepository.existsByUsername(request.getUsername())){
             throw new RuntimeException("Invalid username or password");
         }
@@ -51,7 +51,7 @@ public class AuthService {
                 String accessToken = jwtUtil.generateAccessToken(userDetails);
                 String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
-                return new LoginResponse(accessToken,refreshToken);
+                return new AuthResponse(accessToken,refreshToken, UserMapper.toDTO(user.get()));
             }else {
                 throw new RuntimeException("Invalid username or password");
             }

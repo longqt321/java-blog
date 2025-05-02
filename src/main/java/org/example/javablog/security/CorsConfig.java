@@ -18,8 +18,6 @@ public class CorsConfig {
 
         // If you need to use credentials (cookies, authorization headers)
         config.addAllowedOrigin("http://localhost:5173");
-        config.setAllowCredentials(true);
-
         // Add methods correctly
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
@@ -29,6 +27,8 @@ public class CorsConfig {
         config.addAllowedMethod("OPTIONS");
 
         config.addAllowedHeader("*");
+//        config.setAllowCredentials(true);
+
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

@@ -37,6 +37,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String authHeader = request.getHeader("Authorization");
+        System.out.println("Auth Header: " + authHeader);
         String username = null;
         String jwtToken = null;
 
@@ -60,6 +61,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         }catch (Exception e){
             logger.error("JWT Token is invalid: " + e.getMessage());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Unauthorized");
+            return;
         }
         filterChain.doFilter(request, response);
     }

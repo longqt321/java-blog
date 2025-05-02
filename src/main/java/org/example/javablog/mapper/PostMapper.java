@@ -28,4 +28,16 @@ public class PostMapper {
                 .map(Hashtag::getName)
                 .collect(Collectors.toSet());
     }
+
+    public static Post toEntity(PostDTO post) {
+        return new Post(
+                post.getId(),
+                post.getTitle(),
+                post.getBody(),
+                UserMapper.toEntity(post.getAuthor()),
+                post.getStatus(),
+                post.getCreatedAt(),
+                HashtagMapper.toEntityListFromName(post.getHashtags())
+        );
+    }
 }
