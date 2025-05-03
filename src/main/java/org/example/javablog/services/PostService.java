@@ -30,7 +30,7 @@ public class PostService {
     @Autowired
     private LikeRepository likeRepository;
 
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PostDTO> getPosts(Long userId){
         List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findAll());
         Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
