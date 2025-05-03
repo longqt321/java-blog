@@ -7,6 +7,7 @@ import org.example.javablog.model.Post;
 import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
@@ -29,6 +30,7 @@ public class PostService {
     @Autowired
     private LikeRepository likeRepository;
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     public List<PostDTO> getPosts(Long userId){
         List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findAll());
         Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
