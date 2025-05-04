@@ -12,4 +12,5 @@ public interface LikeRepository extends JpaRepository<LikeRelationship, Long> {
     void deleteByUserIdAndPostId(Long userId, Long postId);
     @Query("SELECT lr.post.id FROM LikeRelationship lr WHERE lr.user.id = :userId")
     Set<Long> findLikedPostIdsByUserId(Long userId);
+    void deleteByPostId(Long postId);
 }

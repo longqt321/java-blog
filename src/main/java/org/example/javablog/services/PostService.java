@@ -1,5 +1,6 @@
 package org.example.javablog.services;
 
+import jakarta.transaction.Transactional;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
@@ -30,7 +31,7 @@ public class PostService {
     @Autowired
     private LikeRepository likeRepository;
 
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PostDTO> getPosts(Long userId){
         List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findAll());
         Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
@@ -86,13 +87,14 @@ public class PostService {
 
         return PostMapper.toDTO(blogRepository.save(updatedPost));
     }
+    @Transactional
     public void deletePost(Long postId, Long userId) {
         Post post = blogRepository.findById(postId).orElseThrow(NullPointerException::new);
 
         if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin(userId)) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
-
+        likeRepository.deleteByPostId(postId);
         blogRepository.delete(post);
     }
 
