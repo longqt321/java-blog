@@ -1,5 +1,5 @@
 package org.example.javablog.model;
 
-public enum Status{
+public enum Visibility {
     PUBLIC, PRIVATE
 }

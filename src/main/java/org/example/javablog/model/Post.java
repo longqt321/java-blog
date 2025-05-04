@@ -34,7 +34,7 @@ public class Post {
     private User author;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Visibility visibility;
 
     @Column(updatable = false)
     @CreationTimestamp

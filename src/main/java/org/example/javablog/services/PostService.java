@@ -8,10 +8,8 @@ import org.example.javablog.model.Post;
 import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +38,7 @@ public class PostService {
                 post.getTitle(),
                 post.getBody(),
                 post.getAuthor(),
-                post.getStatus(),
+                post.getVisibility(),
                 post.getCreatedAt(),
                 post.getHashtags(),
                 likedPostIds.contains(post.getId())
@@ -54,7 +52,7 @@ public class PostService {
                 post.getTitle(),
                 post.getBody(),
                 post.getAuthor(),
-                post.getStatus(),
+                post.getVisibility(),
                 post.getCreatedAt(),
                 post.getHashtags(),
                 likedPostIds.contains(post.getId())
@@ -68,7 +66,7 @@ public class PostService {
         Post newPost = new Post();
         newPost.setTitle(postDTO.getTitle());
         newPost.setBody(postDTO.getBody());
-        newPost.setStatus(postDTO.getStatus());
+        newPost.setVisibility(postDTO.getVisibility());
         newPost.setAuthor(UserMapper.toEntity(postDTO.getAuthor()));
         newPost.setHashtags(postDTO.getHashtags().stream()
                 .map(hashtagName -> hashtagService.getOrCreateHashtag(hashtagName))
@@ -79,7 +77,7 @@ public class PostService {
         Post updatedPost = blogRepository.findById(id).orElseThrow(NullPointerException::new);
         updatedPost.setTitle(postDTO.getTitle());
         updatedPost.setBody(postDTO.getBody());
-        updatedPost.setStatus(postDTO.getStatus());
+        updatedPost.setVisibility(postDTO.getVisibility());
 
         updatedPost.setHashtags(postDTO.getHashtags().stream()
                 .map(hashtagName-> hashtagService.getOrCreateHashtag(hashtagName))

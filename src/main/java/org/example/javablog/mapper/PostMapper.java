@@ -15,7 +15,7 @@ public class PostMapper {
                 post.getTitle(),
                 post.getBody(),
                 UserMapper.toDTO(post.getAuthor()),
-                post.getStatus(),
+                post.getVisibility(),
                 post.getCreatedAt(),
                 getHashtagNames(post.getHashtags()),
                 false // Default value - Always need to be set later <- Unable to create this method without it.
@@ -36,7 +36,7 @@ public class PostMapper {
                 post.getTitle(),
                 post.getBody(),
                 UserMapper.toEntity(post.getAuthor()),
-                post.getStatus(),
+                post.getVisibility(),
                 post.getCreatedAt(),
                 HashtagMapper.toEntitySetFromName(post.getHashtags())
         );
