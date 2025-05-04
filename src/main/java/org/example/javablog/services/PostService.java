@@ -5,6 +5,7 @@ import org.example.javablog.dto.PostDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
+import org.example.javablog.model.Visibility;
 import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +31,8 @@ public class PostService {
     private LikeRepository likeRepository;
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<PostDTO> getPosts(Long userId){
-        List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findAll());
+    public List<PostDTO> getPublicPosts(Long userId){
+        List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findByVisibility(Visibility.PUBLIC));
         Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
         return posts.stream().map(post -> new PostDTO(
                 post.getId(),

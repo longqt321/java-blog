@@ -5,8 +5,10 @@ import org.example.javablog.mapper.HashtagMapper;
 import org.example.javablog.model.Hashtag;
 import org.example.javablog.repository.HashtagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -25,10 +27,7 @@ public class HashtagService {
             return hashtagRepository.save(newHashtag);
         });
     }
-    public List<String> getPopularHashtagNames(){
-        List<Hashtag> hashtags = hashtagRepository.findPopularHashtags();
-        return hashtags.stream()
-                .map(Hashtag::getName)
-                .toList();
+    public Page<HashtagDTO> getPopularHashtags(Pageable pageable){
+        return hashtagRepository.findPopularHashtags(pageable);
     }
 }

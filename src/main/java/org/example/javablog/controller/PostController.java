@@ -8,7 +8,6 @@ import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -24,9 +23,9 @@ public class PostController {
     private UserService userService;
 
     @GetMapping
-    public List<PostDTO> getAllPosts(Principal principal) {
+    public List<PostDTO> getPublicPosts(Principal principal) {
         UserDTO user = userService.getUserByUsername(principal.getName());
-        return postService.getPosts(user.getId());
+        return postService.getPublicPosts(user.getId());
     }
     @GetMapping({"/{id}"})
     public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
