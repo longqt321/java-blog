@@ -2,13 +2,18 @@ package org.example.javablog.services;
 
 import jakarta.transaction.Transactional;
 import org.example.javablog.dto.PostDTO;
+import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
 import org.example.javablog.model.Visibility;
 import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
+import org.example.javablog.specifications.PostSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,6 +34,8 @@ public class PostService {
     private UserService userService;
     @Autowired
     private LikeRepository likeRepository;
+    @Autowired
+    private PostRepository postRepository;
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PostDTO> getPublicPosts(Long userId){
@@ -96,5 +103,8 @@ public class PostService {
         likeRepository.deleteByPostId(postId);
         blogRepository.delete(post);
     }
-
+    public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){
+        Specification<Post> spec = PostSpecification.filterBy(filter);
+        return postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
+    }
 }

@@ -2,15 +2,21 @@ package org.example.javablog.controller;
 
 
 import org.example.javablog.dto.PostDTO;
+import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.dto.UserDTO;
+
 import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.data.domain.Page;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -76,5 +82,27 @@ public class PostController {
         catch (NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
+    }
+    @GetMapping("/search")
+    public Page<PostDTO> getPosts(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) List<String> hashtags,
+            @RequestParam(required = false) String author,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sortBy,
+            Sort sort) {
+        PostFilterRequest filter = new PostFilterRequest();
+        filter.setTitle(title);
+        filter.setHashtags(hashtags);
+        filter.setAuthorName(author);
+
+        String prop = sortBy.split(",")[0];
+        String direction = sortBy.split(",")[1];
+
+        Sort sorter = Sort.by(new Sort.Order(Sort.Direction.fromString(direction), prop));
+
+        Pageable pageable = PageRequest.of(page, size, sorter);
+        return postService.searchPosts(filter, pageable);
     }
 }
