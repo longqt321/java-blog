@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.example.javablog.constant.Relationship;
 
 @Entity
-@Table(name = "relationships")
+@Table(name = "user_relationships")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

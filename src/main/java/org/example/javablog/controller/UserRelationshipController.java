@@ -41,4 +41,13 @@ public class UserRelationshipController {
         userRelationshipService.block(sourceId, targetId);
         return ResponseEntity.ok("Blocked successfully.");
     }
+    @DeleteMapping("/reset/{targetId}")
+    public ResponseEntity<String> resetRelationship(@PathVariable Long targetId) {
+        Long sourceId = userService.getCurrentUser().getId();
+        if (sourceId.equals(targetId)) {
+            return ResponseEntity.badRequest().body("You cannot reset your relationship with yourself.");
+        }
+        userRelationshipService.resetRelationship(sourceId, targetId);
+        return ResponseEntity.ok("Relationship reset successfully.");
+    }
 }

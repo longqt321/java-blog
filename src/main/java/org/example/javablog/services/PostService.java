@@ -7,7 +7,6 @@ import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
 import org.example.javablog.constant.Visibility;
-import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.specifications.PostSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -32,15 +32,14 @@ public class PostService {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private LikeRepository likeRepository;
+
     @Autowired
     private PostRepository postRepository;
 
     //@PreAuthorize("hasRole('ROLE_ADMIN')")
     public List<PostDTO> getPublicPosts(Long userId){
         List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findByVisibility(Visibility.PUBLIC));
-        Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
+        Set<Long> likedPostIds = new HashSet<>(); // temporary fix
         return posts.stream().map(post -> new PostDTO(
                 post.getId(),
                 post.getTitle(),
@@ -54,7 +53,7 @@ public class PostService {
     }
     public List<PostDTO> getPostsByUserId(Long userId) {
         List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
-        Set<Long> likedPostIds = likeRepository.findLikedPostIdsByUserId(userId);
+        Set<Long> likedPostIds = new HashSet<>(); // temporary fix
         return posts.stream().map(post -> new PostDTO(
                 post.getId(),
                 post.getTitle(),
@@ -100,7 +99,6 @@ public class PostService {
         if (!post.getAuthor().getId().equals(userId) && userService.isAdmin(userId)) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
-        likeRepository.deleteByPostId(postId);
         blogRepository.delete(post);
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){

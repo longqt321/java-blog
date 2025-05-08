@@ -1,5 +1,6 @@
 package org.example.javablog.services;
 
+import jakarta.transaction.Transactional;
 import org.example.javablog.constant.Relationship;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.model.User;
@@ -26,7 +27,6 @@ public class UserRelationshipService {
     public void follow(Long sourceId, Long targetId){
         UserRelationship userRelationship = userRelationshipRepository.findBySourceUserIdAndTargetUserId(sourceId, targetId)
                 .orElse(new UserRelationship());
-
         User sourceUser = UserMapper.toEntity(userService.getUserById(sourceId));
         User targetUser = UserMapper.toEntity(userService.getUserById(targetId));
 
@@ -47,6 +47,7 @@ public class UserRelationshipService {
         userRelationship.setRelationship(Relationship.BLOCKING);
         userRelationshipRepository.save(userRelationship);
     }
+    @Transactional
     public void resetRelationship(Long sourceId, Long targetId){
         userRelationshipRepository.deleteBySourceUserIdAndTargetUserId(sourceId, targetId);
     }
