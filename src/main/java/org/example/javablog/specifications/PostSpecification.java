@@ -22,6 +22,12 @@ public class PostSpecification {
         if (filter.getAuthorName() != null) {
             spec = spec.and(hasAuthorName(filter.getAuthorName()));
         }
+        if (filter.getVisibility() != null) {
+            spec = spec.and(hasVisibility(filter.getVisibility()));
+        }
+        if (filter.getUsername() != null) {
+            spec = spec.and(hasUsername(filter.getUsername()));
+        }
         return spec;
     }
     private static Specification<Post> hasHashtags(List<String> hashtags) {
@@ -57,5 +63,10 @@ public class PostSpecification {
             return cb.like(fullNameCombined, "%" + authorName.toLowerCase() + "%");
         };
     }
-
+    private static Specification<Post> hasVisibility(String visibility) {
+        return (root, query, cb) -> cb.equal(root.get("visibility"), visibility);
+    }
+    private static Specification<Post> hasUsername(String username) {
+        return (root, query, cb) -> cb.equal(root.get("author").get("username"), username);
+    }
 }

@@ -9,4 +9,6 @@ public class PostFilterRequest {
     private String title;
     private List<String> hashtags;
     private String authorName;
+    private String visibility;
+    private String username;
 }
