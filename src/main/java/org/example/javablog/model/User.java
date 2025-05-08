@@ -2,6 +2,7 @@ package org.example.javablog.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.example.javablog.constant.Role;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
@@ -14,7 +15,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,10 +34,6 @@ public class User {
 
     @Column(columnDefinition = "TEXT")
     private String description;
-
-    @Column(updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private Set<Post> posts = new HashSet<>();

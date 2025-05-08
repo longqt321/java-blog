@@ -1,4 +1,4 @@
-package org.example.javablog.model;
+package org.example.javablog.constant;
 
 public enum Role {
     ROLE_USER,

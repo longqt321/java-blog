@@ -3,9 +3,10 @@ package org.example.javablog.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.javablog.model.Visibility;
+import org.example.javablog.constant.Visibility;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
@@ -17,7 +18,7 @@ public class PostDTO {
     private String body;
     private UserDTO author;
     private Visibility visibility;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
     private Set<String> hashtags;
     private boolean liked;
 }

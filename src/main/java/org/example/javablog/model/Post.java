@@ -1,10 +1,12 @@
 package org.example.javablog.model;
 
+import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.javablog.constant.Visibility;
 import org.hibernate.annotations.CreationTimestamp;
 
 
@@ -18,7 +20,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post {
+public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -35,10 +37,6 @@ public class Post {
 
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
-
-    @Column(updatable = false)
-    @CreationTimestamp
-    private Timestamp createdAt;
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(

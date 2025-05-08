@@ -31,14 +31,13 @@ public class PostMapper {
     }
 
     public static Post toEntity(PostDTO post) {
-        return new Post(
-                post.getId(),
-                post.getTitle(),
-                post.getBody(),
-                UserMapper.toEntity(post.getAuthor()),
-                post.getVisibility(),
-                post.getCreatedAt(),
-                HashtagMapper.toEntitySetFromName(post.getHashtags())
-        );
+        Post postEntity = new Post();
+        postEntity.setId(post.getId());
+        postEntity.setTitle(post.getTitle());
+        postEntity.setBody(post.getBody());
+        postEntity.setAuthor(UserMapper.toEntity(post.getAuthor()));
+        postEntity.setVisibility(post.getVisibility());
+        postEntity.setCreatedAt(post.getCreatedAt());
+        return postEntity;
     }
 }

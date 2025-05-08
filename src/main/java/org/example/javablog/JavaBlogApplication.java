@@ -1,6 +1,6 @@
 package org.example.javablog;
 
-import org.example.javablog.model.Role;
+import org.example.javablog.constant.Role;
 import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,8 +8,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@EnableJpaAuditing
 @SpringBootApplication
 public class JavaBlogApplication {
 

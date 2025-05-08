@@ -1,9 +1,10 @@
 package org.example.javablog.dto;
 
 import lombok.*;
-import org.example.javablog.model.Role;
+import org.example.javablog.constant.Role;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 
 @Data
@@ -15,5 +16,5 @@ public class UserDTO {
     private String username;
     private String description;
     private Role role;
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 }

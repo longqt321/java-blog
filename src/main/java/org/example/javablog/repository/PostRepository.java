@@ -1,7 +1,7 @@
 package org.example.javablog.repository;
 
 import org.example.javablog.model.Post;
-import org.example.javablog.model.Visibility;
+import org.example.javablog.constant.Visibility;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;

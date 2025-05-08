@@ -5,7 +5,7 @@ import org.example.javablog.dto.AuthResponse;
 import org.example.javablog.dto.RegisterRequest;
 import org.example.javablog.dto.RegisterResponse;
 import org.example.javablog.mapper.UserMapper;
-import org.example.javablog.model.Role;
+import org.example.javablog.constant.Role;
 import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
 import org.example.javablog.security.CustomUserDetails;

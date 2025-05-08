@@ -6,7 +6,7 @@ import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
-import org.example.javablog.model.Visibility;
+import org.example.javablog.constant.Visibility;
 import org.example.javablog.repository.LikeRepository;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.specifications.PostSpecification;
@@ -97,7 +97,7 @@ public class PostService {
     public void deletePost(Long postId, Long userId) {
         Post post = blogRepository.findById(postId).orElseThrow(NullPointerException::new);
 
-        if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin(userId)) {
+        if (!post.getAuthor().getId().equals(userId) && userService.isAdmin(userId)) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
         likeRepository.deleteByPostId(postId);
