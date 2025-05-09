@@ -1,6 +1,6 @@
 package org.example.javablog.constant;
 
-public enum Relationship {
+public enum UserRelationshipType {
     NONE,
     FOLLOWING,
     BLOCKING

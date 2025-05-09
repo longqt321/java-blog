@@ -1,7 +1,7 @@
 package org.example.javablog.services;
 
 import jakarta.transaction.Transactional;
-import org.example.javablog.constant.Relationship;
+import org.example.javablog.constant.UserRelationshipType;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.model.User;
 import org.example.javablog.model.UserRelationship;
@@ -19,10 +19,10 @@ public class UserRelationshipService {
     @Autowired
     private UserRepository userRepository;
 
-    public Relationship getRelationship(Long sourceId, Long targetId) {
+    public UserRelationshipType getRelationship(Long sourceId, Long targetId) {
         return userRelationshipRepository.findBySourceUserIdAndTargetUserId(sourceId, targetId)
-                .map(UserRelationship::getRelationship)
-                .orElse(Relationship.NONE);
+                .map(UserRelationship::getUserRelationshipType)
+                .orElse(UserRelationshipType.NONE);
     }
     public void follow(Long sourceId, Long targetId){
         UserRelationship userRelationship = userRelationshipRepository.findBySourceUserIdAndTargetUserId(sourceId, targetId)
@@ -32,7 +32,7 @@ public class UserRelationshipService {
 
         userRelationship.setSourceUser(sourceUser);
         userRelationship.setTargetUser(targetUser);
-        userRelationship.setRelationship(Relationship.FOLLOWING);
+        userRelationship.setUserRelationshipType(UserRelationshipType.FOLLOWING);
         userRelationshipRepository.save(userRelationship);
     }
     public void block(Long sourceId, Long targetId){
@@ -44,7 +44,7 @@ public class UserRelationshipService {
 
         userRelationship.setSourceUser(sourceUser);
         userRelationship.setTargetUser(targetUser);
-        userRelationship.setRelationship(Relationship.BLOCKING);
+        userRelationship.setUserRelationshipType(UserRelationshipType.BLOCKING);
         userRelationshipRepository.save(userRelationship);
     }
     @Transactional

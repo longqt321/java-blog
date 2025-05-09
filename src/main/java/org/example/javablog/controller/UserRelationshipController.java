@@ -1,14 +1,11 @@
 package org.example.javablog.controller;
 
-import org.example.javablog.constant.Relationship;
-import org.example.javablog.model.UserRelationship;
+import org.example.javablog.constant.UserRelationshipType;
 import org.example.javablog.services.UserRelationshipService;
 import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/user-relationships")
@@ -20,7 +17,7 @@ public class UserRelationshipController {
     private UserService userService;
 
     @GetMapping("/{targetId}")
-    public Relationship getUserRelationships(@PathVariable Long targetId) {
+    public UserRelationshipType getUserRelationships(@PathVariable Long targetId) {
         return userRelationshipService.getRelationship(userService.getCurrentUser().getId(), targetId);
     }
     @PostMapping("/follow/{targetId}")

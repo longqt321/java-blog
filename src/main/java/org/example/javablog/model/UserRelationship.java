@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.example.javablog.constant.Relationship;
+import org.example.javablog.constant.UserRelationshipType;
 
 @Entity
 @Table(name = "user_relationships")
@@ -25,6 +25,6 @@ public class UserRelationship extends BaseEntity {
     private User targetUser;
 
     @Enumerated(EnumType.STRING)
-    private Relationship relationship;
+    private UserRelationshipType userRelationshipType;
 
 }
