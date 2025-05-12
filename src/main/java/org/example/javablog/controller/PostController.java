@@ -1,9 +1,7 @@
 package org.example.javablog.controller;
 
 
-import org.example.javablog.dto.PostDTO;
-import org.example.javablog.dto.PostFilterRequest;
-import org.example.javablog.dto.UserDTO;
+import org.example.javablog.dto.*;
 
 import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
@@ -84,7 +82,7 @@ public class PostController {
         }
     }
     @GetMapping("/search")
-    public Page<PostDTO> getPosts(
+    public ResponseEntity<?> getPosts(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) List<String> hashtags,
             @RequestParam(required = false) String author,
@@ -107,6 +105,15 @@ public class PostController {
         Sort sorter = Sort.by(new Sort.Order(Sort.Direction.fromString(direction), prop));
 
         Pageable pageable = PageRequest.of(page, size, sorter);
-        return postService.searchPosts(filter, pageable);
+        Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
+        PageResponse<PostDTO> pageResponse = new PageResponse<>(postPage.getContent(),
+                postPage.getNumber(),
+                postPage.getSize(),
+                postPage.getTotalElements(),
+                postPage.getTotalPages(),
+                postPage.isFirst(),
+                postPage.isLast());
+        ApiResponse<PageResponse<PostDTO>> response = new ApiResponse<>(true, "Posts retrieved successfully",pageResponse);
+        return ResponseEntity.ok(response);
     }
 }

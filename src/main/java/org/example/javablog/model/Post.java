@@ -2,10 +2,7 @@ package org.example.javablog.model;
 
 import com.fasterxml.jackson.databind.ser.Serializers;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.example.javablog.constant.Visibility;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -20,6 +17,7 @@ import java.util.Set;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Post extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +29,7 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String body;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     @JoinColumn(name = "author_id",nullable = false)
     private User author;
 

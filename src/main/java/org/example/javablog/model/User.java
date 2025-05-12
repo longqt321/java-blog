@@ -11,6 +11,7 @@ import java.util.Set;
 
 @Entity
 @Table(name ="users")
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor
@@ -29,7 +30,7 @@ public class User extends BaseEntity {
     @Column(length = 20, unique = true,nullable = false)
     private String username;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String password;
 
     @Column(columnDefinition = "TEXT")
