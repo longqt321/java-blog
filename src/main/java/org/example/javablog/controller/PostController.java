@@ -27,61 +27,6 @@ public class PostController {
     private UserService userService;
 
     @GetMapping
-    public List<PostDTO> getPublicPosts(Principal principal) {
-        UserDTO user = userService.getUserByUsername(principal.getName());
-        return postService.getPublicPosts(user.getId());
-    }
-    @GetMapping({"/{id}"})
-    public ResponseEntity<PostDTO> getPostById(@PathVariable Long id) {
-        try {
-            PostDTO post = postService.getPostById(id);
-            return ResponseEntity.ok(post);
-        } catch(NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<PostDTO>> getPostsByUserId(@PathVariable Long userId) {
-        try {
-            List<PostDTO> posts = postService.getPostsByUserId(userId);
-            return ResponseEntity.ok(posts);
-        } catch (NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @PostMapping("")
-    public ResponseEntity<PostDTO> createPost(@RequestBody PostDTO post, Principal principal) {
-        UserDTO user = userService.getUserByUsername(principal.getName());
-        post.setAuthor(user);
-        System.out.println(user);
-        PostDTO createdPost = postService.createPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPost);
-    }
-    @PutMapping("/{id}")
-    public ResponseEntity<PostDTO> updatePost(@PathVariable Long id, @RequestBody PostDTO post) {
-        try{
-            PostDTO updatedPost = postService.updatePost(id,post);
-            return ResponseEntity.ok(updatedPost);
-        }catch(NullPointerException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId, Principal principal) {
-        try {
-            String currentUsername = principal.getName();
-            Long userId = userService.getUserByUsername(currentUsername).getId();
-            postService.deletePost(postId, userId);
-            return ResponseEntity.noContent().build();
-        }
-        catch (SecurityException e){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-        catch (NullPointerException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-    }
-    @GetMapping("/search")
     public ResponseEntity<?> getPosts(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) List<String> hashtags,
@@ -116,4 +61,46 @@ public class PostController {
         ApiResponse<PageResponse<PostDTO>> response = new ApiResponse<>(true, "Posts retrieved successfully",pageResponse);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping({"/{id}"})
+    public ResponseEntity<?> getPostById(@PathVariable Long id) {
+        try {
+            PostDTO post = postService.getPostById(id);
+
+            return ResponseEntity.ok(new ApiResponse<PostDTO>(true, "Post retrieved successfully", post));
+        } catch(NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Post not found", null));
+        }
+    }
+    @PostMapping("")
+    public ResponseEntity<?> createPost(@RequestBody PostDTO post) {
+        UserDTO user = userService.getCurrentUser();
+        post.setAuthor(user);
+        PostDTO createdPost = postService.createPost(post);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<PostDTO>(true, "Post created successfully", createdPost));
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostDTO post) {
+        try{
+            PostDTO updatedPost = postService.updatePost(id,post);
+            return ResponseEntity.ok(new ApiResponse<PostDTO>(true, "Post updated successfully", updatedPost));
+        }catch(NullPointerException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Post not found", null));
+        }
+    }
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        try {
+            Long userId = userService.getCurrentUser().getId();
+            postService.deletePost(postId, userId);
+            return ResponseEntity.noContent().build();
+        }
+        catch (SecurityException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse<>(false,"You are not authorized to delete this post", null));
+        }
+        catch (NullPointerException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Post not found", null));
+        }
+    }
+
 }

@@ -36,36 +36,6 @@ public class PostService {
     @Autowired
     private PostRepository postRepository;
 
-    //@PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<PostDTO> getPublicPosts(Long userId){
-        List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findByVisibility(Visibility.PUBLIC));
-        Set<Long> likedPostIds = new HashSet<>(); // temporary fix
-        return posts.stream().map(post -> new PostDTO(
-                post.getId(),
-                post.getTitle(),
-                post.getBody(),
-                post.getAuthor(),
-                post.getVisibility(),
-                post.getCreatedAt(),
-                post.getHashtags(),
-                likedPostIds.contains(post.getId())
-        )).collect(Collectors.toList());
-    }
-    public List<PostDTO> getPostsByUserId(Long userId) {
-        List<PostDTO> posts = PostMapper.toDTOList(blogRepository.findByAuthorId(userId));
-        Set<Long> likedPostIds = new HashSet<>(); // temporary fix
-        return posts.stream().map(post -> new PostDTO(
-                post.getId(),
-                post.getTitle(),
-                post.getBody(),
-                post.getAuthor(),
-                post.getVisibility(),
-                post.getCreatedAt(),
-                post.getHashtags(),
-                likedPostIds.contains(post.getId())
-        )).collect(Collectors.toList());
-    }
-
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
@@ -96,7 +66,7 @@ public class PostService {
     public void deletePost(Long postId, Long userId) {
         Post post = blogRepository.findById(postId).orElseThrow(NullPointerException::new);
 
-        if (!post.getAuthor().getId().equals(userId) && userService.isAdmin(userId)) {
+        if (!post.getAuthor().getId().equals(userId) || !userService.isAdmin(userId)) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
         blogRepository.delete(post);
