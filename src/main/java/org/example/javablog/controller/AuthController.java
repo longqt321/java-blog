@@ -41,7 +41,7 @@ public class AuthController {
         }catch(RuntimeException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(e.getMessage()));
+                    .body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
 
@@ -53,10 +53,10 @@ public class AuthController {
                     .status(HttpStatus.CREATED)
                     .body(response);
         }catch(RuntimeException e) {
-            ErrorResponse eResponse = new ErrorResponse(e.getMessage());
+
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) //Should be eResponse.getStatusCode()
-                    .body(eResponse);
+                    .body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
     @PostMapping("/refresh")
@@ -69,7 +69,7 @@ public class AuthController {
         }catch(RuntimeException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
-                    .body(new ErrorResponse(e.getMessage()));
+                    .body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
 }

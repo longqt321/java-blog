@@ -17,4 +17,5 @@ public class UserDTO {
     private String description;
     private Role role;
     private LocalDateTime createdAt;
+
 }

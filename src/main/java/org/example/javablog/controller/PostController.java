@@ -1,6 +1,7 @@
 package org.example.javablog.controller;
 
 
+import org.apache.coyote.Response;
 import org.example.javablog.dto.*;
 
 import org.example.javablog.services.PostService;
@@ -13,8 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 
-import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -67,7 +66,7 @@ public class PostController {
         try {
             PostDTO post = postService.getPostById(id);
 
-            return ResponseEntity.ok(new ApiResponse<PostDTO>(true, "Post retrieved successfully", post));
+            return ResponseEntity.ok(new ApiResponse<>(true, "Post retrieved successfully", post));
         } catch(NullPointerException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Post not found", null));
         }
@@ -77,13 +76,13 @@ public class PostController {
         UserDTO user = userService.getCurrentUser();
         post.setAuthor(user);
         PostDTO createdPost = postService.createPost(post);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<PostDTO>(true, "Post created successfully", createdPost));
+        return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse<>(true, "Post created successfully", createdPost));
     }
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePost(@PathVariable Long id, @RequestBody PostDTO post) {
         try{
             PostDTO updatedPost = postService.updatePost(id,post);
-            return ResponseEntity.ok(new ApiResponse<PostDTO>(true, "Post updated successfully", updatedPost));
+            return ResponseEntity.ok(new ApiResponse<>(true, "Post updated successfully", updatedPost));
         }catch(NullPointerException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Post not found", null));
         }
@@ -102,5 +101,64 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false, "Post not found", null));
         }
     }
-
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> likePost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.likePost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Liked successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/unlike")
+    public ResponseEntity<?> unlikePost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.unlikePost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Unliked successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/hide")
+    public ResponseEntity<?> hidePost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.hidePost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Hide post successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/unhide")
+    public ResponseEntity<?> unhidePost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.unhidePost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Unhide post successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/report")
+    public ResponseEntity<?> reportPost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.reportPost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Report post successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/unreport")
+    public ResponseEntity<?> unreportPost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.unreportPost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Unreport post successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
 }

@@ -8,7 +8,8 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.mapping.Join;
 
 @Entity
-@Table(name = "post_relationships")
+@Table(name = "post_relationships",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"relationship_type", "user_id", "post_id"}))
 @Getter
 @Setter
 @Builder

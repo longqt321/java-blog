@@ -1,14 +1,18 @@
 package org.example.javablog.services;
 
 import jakarta.transaction.Transactional;
+import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
 import org.example.javablog.constant.Visibility;
+import org.example.javablog.model.PostRelationship;
+import org.example.javablog.repository.PostRelationshipRepository;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.specifications.PostSpecification;
+import org.example.javablog.util.PostUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +39,12 @@ public class PostService {
 
     @Autowired
     private PostRepository postRepository;
+
+    @Autowired
+    private PostRelationshipRepository postRelationshipRepository;
+
+    @Autowired
+    private PostUtil postUtil;
 
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
@@ -74,5 +84,44 @@ public class PostService {
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){
         Specification<Post> spec = PostSpecification.filterBy(filter);
         return postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
+    }
+    public void likePost(Long userId,Long postId){
+        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
+            return;
+        }
+        if (postUtil.validateOwnership(userId,postId)){
+            throw new IllegalArgumentException("You cannot like your own posts");
+        }
+        postRelationshipRepository.save(PostRelationship.fromIds(userId, postId, PostRelationshipType.LIKED));
+    }
+    @Transactional
+    public void unlikePost(Long userId,Long postId){
+        postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.LIKED);
+    }
+    public void hidePost(Long userId,Long postId){
+        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.HIDDEN)){
+            return;
+        }
+        if (postUtil.validateOwnership(userId,postId)){
+            throw new IllegalArgumentException("You cannot hide your own posts");
+        }
+        postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.HIDDEN));
+    }
+    @Transactional
+    public void unhidePost(Long userId,Long postId){
+        postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.HIDDEN);
+    }
+    public void reportPost(Long userId,Long postId){
+        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.REPORTED)){
+            return;
+        }
+        if (postUtil.validateOwnership(userId,postId)){
+            throw new IllegalArgumentException("You cannot report your own posts");
+        }
+        postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.REPORTED));
+    }
+    @Transactional
+    public void unreportPost(Long userId,Long postId){
+        postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.REPORTED);
     }
 }
