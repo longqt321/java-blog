@@ -1,5 +1,8 @@
 package org.example.javablog.services;
 
+import org.example.javablog.constant.UserRelationshipType;
+import org.example.javablog.model.UserRelationship;
+import org.example.javablog.repository.UserRelationshipRepository;
 import org.springframework.security.core.Authentication;
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.mapper.UserMapper;
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +23,9 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private UserRelationshipRepository userRelationshipRepository;
 
     public List<UserDTO> getAllUsers() {
         return UserMapper.toDTOList(userRepository.findAll());
@@ -41,6 +48,42 @@ public class UserService {
                 .map(user -> user.getRole() == Role.ROLE_ADMIN)
                 .orElse(false);
     }
+    public void followUser(Long sourceId,Long targetId){
+        if (sourceId.equals(targetId)) return;
+        if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.FOLLOWING)){
+            throw new SecurityException("You are already following this user");
+        }
+        if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.BLOCKING)){
+            throw new SecurityException("You are blocking this user");
+        }
+        userRelationshipRepository.save(UserRelationship.fromIds(sourceId, targetId, UserRelationshipType.FOLLOWING));
+    }
+    @Transactional
+    public void unfollowUser(Long sourceId,Long targetId){
+        if (!userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.FOLLOWING)){
+            throw new SecurityException("You are not following this user");
+        }
+        userRelationshipRepository.deleteBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId,targetId,UserRelationshipType.FOLLOWING);
+    }
+    @Transactional
+    public void blockUser(Long sourceId,Long targetId){
+        if (sourceId.equals(targetId)) return;
+        if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.BLOCKING)){
+            throw new SecurityException("You are already blocking this user");
+        }
+        if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.FOLLOWING)){
+            this.unfollowUser(sourceId, targetId);
+        }
+        userRelationshipRepository.save(UserRelationship.fromIds(sourceId, targetId, UserRelationshipType.BLOCKING));
+    }
+    @Transactional
+    public void unblockUser(Long sourceId,Long targetId){
+        if (!userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.BLOCKING)){
+            throw new SecurityException("You are not blocking this user");
+        }
+        userRelationshipRepository.deleteBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId,targetId,UserRelationshipType.BLOCKING);
+    }
+
     public UserDTO getCurrentUser(){
         final Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();

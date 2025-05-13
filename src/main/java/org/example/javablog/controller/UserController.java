@@ -1,5 +1,6 @@
 package org.example.javablog.controller;
 
+import org.example.javablog.dto.ApiResponse;
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,46 @@ public class UserController {
         }
         catch(NullPointerException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    @PostMapping("/{targetId}/follow")
+    public ResponseEntity<?> followUser(@PathVariable Long targetId){
+        try{
+            Long sourceId = userService.getCurrentUser().getId();
+            userService.followUser(sourceId,targetId);
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"Followed successfully",null));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{targetId}/unfollow")
+    public ResponseEntity<?> unfollowUser(@PathVariable Long targetId){
+        try {
+            Long sourceId = userService.getCurrentUser().getId();
+            userService.unfollowUser(sourceId, targetId);
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"Unfollowed successfully",null));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{targetId}/block")
+    public ResponseEntity<?> blockUser(@PathVariable Long targetId){
+        try{
+            Long sourceId = userService.getCurrentUser().getId();
+            userService.blockUser(sourceId,targetId);
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"Blocked successfully",null));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{targetId}/unblock")
+    public ResponseEntity<?> unblockUser(@PathVariable Long targetId){
+        try{
+            Long sourceId = userService.getCurrentUser().getId();
+            userService.unblockUser(sourceId,targetId);
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"Unblocked successfully",null));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
 }
