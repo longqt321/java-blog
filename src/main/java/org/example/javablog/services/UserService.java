@@ -85,7 +85,7 @@ public class UserService {
     }
 
     public UserDTO getCurrentUser(){
-        final Authentication authentication = (Authentication) SecurityContextHolder.getContext().getAuthentication();
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         String username = userDetails.getUsername();
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findByUsername(username).orElse(null)));
