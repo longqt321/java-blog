@@ -13,4 +13,5 @@ public interface UserRelationshipRepository  extends JpaRepository<UserRelations
     boolean existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(Long sourceId, Long targetId, UserRelationshipType type);
     Long countBySourceUserIdAndUserRelationshipType(Long sourceId, UserRelationshipType type);
     Long countByTargetUserIdAndUserRelationshipType(Long targetId, UserRelationshipType type);
+    Optional<UserRelationship> findBySourceUserIdAndTargetUserId(Long sourceId, Long targetId);
 }

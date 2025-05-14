@@ -133,6 +133,11 @@ public class UserService {
     public Long getFollowingCount(Long userId){
         return userRelationshipRepository.countBySourceUserIdAndUserRelationshipType(userId, UserRelationshipType.FOLLOWING);
     }
+    public UserRelationshipType getUserRelationship(Long sourceId, Long targetId) {
+        return userRelationshipRepository.findBySourceUserIdAndTargetUserId(sourceId, targetId)
+                .map(UserRelationship::getUserRelationshipType)
+                .orElse(null);
+    }
 
     public UserDTO getCurrentUser(){
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

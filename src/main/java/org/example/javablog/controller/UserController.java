@@ -140,4 +140,13 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
+    @GetMapping("/relationship/{targetId}")
+    public ResponseEntity<?> getUserRelationships(@PathVariable Long targetId){
+        try{
+            Long sourceId = userService.getCurrentUser().getId();
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"User relationships retrieved successfully",userService.getUserRelationship(sourceId,targetId)));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
 }
