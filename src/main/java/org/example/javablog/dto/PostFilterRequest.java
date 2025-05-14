@@ -10,5 +10,7 @@ public class PostFilterRequest {
     private List<String> hashtags;
     private String authorName;
     private String visibility;
-    private String username;
+    private Long userId;
+    private Long authorId;
+    private String relationshipType;
 }

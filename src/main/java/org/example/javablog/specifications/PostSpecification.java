@@ -1,12 +1,13 @@
 package org.example.javablog.specifications;
 
-import jakarta.persistence.criteria.Expression;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.*;
+import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.model.Hashtag;
 import org.example.javablog.model.Post;
+import org.example.javablog.model.PostRelationship;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -25,9 +26,14 @@ public class PostSpecification {
         if (filter.getVisibility() != null) {
             spec = spec.and(hasVisibility(filter.getVisibility()));
         }
-        if (filter.getUsername() != null) {
-            spec = spec.and(hasUsername(filter.getUsername()));
+        if (filter.getRelationshipType() != null && filter.getUserId() != null) {
+            spec = spec.and(hasRelationship(filter.getRelationshipType(), filter.getUserId()));
         }
+        if (filter.getAuthorId() != null) {
+            spec = spec.and(hasAuthorId(filter.getAuthorId()));
+        }
+
+
         return spec;
     }
     private static Specification<Post> hasHashtags(List<String> hashtags) {
@@ -66,7 +72,27 @@ public class PostSpecification {
     private static Specification<Post> hasVisibility(String visibility) {
         return (root, query, cb) -> cb.equal(root.get("visibility"), visibility);
     }
-    private static Specification<Post> hasUsername(String username) {
-        return (root, query, cb) -> cb.equal(root.get("author").get("username"), username);
+    private static Specification<Post> hasAuthorId(Long userId) {
+        return (root, query, cb) -> cb.equal(root.get("author").get("id"), userId);
     }
+    private static Specification<Post> hasRelationship(String relationship, Long userId) {
+        return (root, query, cb) -> {
+            if (!StringUtils.hasText(relationship)) {
+                return cb.conjunction();
+            }
+
+            assert query != null;
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<PostRelationship> relRoot = subquery.from(PostRelationship.class);
+
+            subquery.select(relRoot.get("post").get("id"))
+                    .where(
+                            cb.equal(relRoot.get("user").get("id"), userId),
+                            cb.equal(relRoot.get("postRelationshipType"), PostRelationshipType.valueOf(relationship.toUpperCase()))
+                    );
+
+            return root.get("id").in(subquery);
+        };
+    }
+
 }

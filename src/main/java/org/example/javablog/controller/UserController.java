@@ -1,7 +1,9 @@
 package org.example.javablog.controller;
 
+import org.apache.coyote.Response;
 import org.example.javablog.dto.ApiResponse;
 import org.example.javablog.dto.UserDTO;
+import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,10 +18,23 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private PostService postService;
 
     @GetMapping
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers();
+    }
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentUser(){
+        try{
+            return ResponseEntity.ok().body(new ApiResponse<>(true,
+                    "Current logged in user retrieved successfully",
+                    userService.getCurrentUser()
+                    ));
+        }catch(NullPointerException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false,"Unable to retrieve current logged in user",null));
+        }
     }
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
@@ -28,6 +43,22 @@ public class UserController {
             return ResponseEntity.ok(user);
         }catch(NullPointerException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    @GetMapping("/{userId}/blogs")
+    public ResponseEntity<?> getOwnedBlogs(@PathVariable Long userId){
+        try{
+            return ResponseEntity.ok().body(new ApiResponse<>(
+                    true,
+                    "All posts of this user retrieved successfully",
+                    postService.getPostsByAuthorId(userId)
+            ));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(
+                    false,
+                    e.getMessage(),
+                    null
+            ));
         }
     }
     @DeleteMapping("/{deletedUserId}")

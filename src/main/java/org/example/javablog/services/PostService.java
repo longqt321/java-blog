@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.dto.PostFilterRequest;
+import org.example.javablog.dto.UserDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
@@ -49,6 +50,9 @@ public class PostService {
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
+    public List<PostDTO> getPostsByAuthorId(Long id){
+        return PostMapper.toDTOList(Objects.requireNonNull(blogRepository.findByAuthorId(id)));
+    }
     public PostDTO createPost(PostDTO postDTO) {
         Post newPost = new Post();
         newPost.setTitle(postDTO.getTitle());
@@ -82,9 +86,14 @@ public class PostService {
         blogRepository.delete(post);
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){
+//        UserDTO user = userService.getCurrentUser();
+//        if (filter.getUsername() == null || !user.getUsername().equals(filter.getUsername())){
+//            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
+//        }
         Specification<Post> spec = PostSpecification.filterBy(filter);
         return postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
     }
+
     public void likePost(Long userId,Long postId){
         if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
             return;

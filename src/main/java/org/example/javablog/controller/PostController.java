@@ -31,7 +31,9 @@ public class PostController {
             @RequestParam(required = false) List<String> hashtags,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String visibility,
-            @RequestParam(required = false) String username,
+            @RequestParam(required = false) Long authorId,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String relationshipType,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sortBy,
@@ -40,8 +42,11 @@ public class PostController {
         filter.setTitle(title);
         filter.setHashtags(hashtags);
         filter.setAuthorName(author);
-        filter.setUsername(username);
+        filter.setUserId(userId);
+        filter.setAuthorId(authorId);
         filter.setVisibility(visibility);
+        filter.setRelationshipType(relationshipType);
+
 
         String prop = sortBy.split(",")[0];
         String direction = sortBy.split(",")[1];
