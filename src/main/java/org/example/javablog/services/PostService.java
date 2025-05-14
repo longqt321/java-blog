@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.dto.PostFilterRequest;
-import org.example.javablog.dto.UserDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
@@ -13,17 +12,15 @@ import org.example.javablog.model.PostRelationship;
 import org.example.javablog.repository.PostRelationshipRepository;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.specifications.PostSpecification;
-import org.example.javablog.util.PostUtil;
+import org.example.javablog.util.PostUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +42,7 @@ public class PostService {
     private PostRelationshipRepository postRelationshipRepository;
 
     @Autowired
-    private PostUtil postUtil;
+    private PostUtils postUtils;
 
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
@@ -95,10 +92,10 @@ public class PostService {
     }
 
     public void likePost(Long userId,Long postId){
-        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
+        if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
             return;
         }
-        if (postUtil.validateOwnership(userId,postId)){
+        if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot like your own posts");
         }
         postRelationshipRepository.save(PostRelationship.fromIds(userId, postId, PostRelationshipType.LIKED));
@@ -108,10 +105,10 @@ public class PostService {
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.LIKED);
     }
     public void hidePost(Long userId,Long postId){
-        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.HIDDEN)){
+        if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.HIDDEN)){
             return;
         }
-        if (postUtil.validateOwnership(userId,postId)){
+        if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot hide your own posts");
         }
         postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.HIDDEN));
@@ -121,10 +118,10 @@ public class PostService {
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.HIDDEN);
     }
     public void reportPost(Long userId,Long postId){
-        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.REPORTED)){
+        if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.REPORTED)){
             return;
         }
-        if (postUtil.validateOwnership(userId,postId)){
+        if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot report your own posts");
         }
         postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.REPORTED));
@@ -134,10 +131,10 @@ public class PostService {
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.REPORTED);
     }
     public void savePost(Long userId,Long postId){
-        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.SAVED)){
+        if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.SAVED)){
             return;
         }
-        if (postUtil.validateOwnership(userId,postId)){
+        if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot save your own posts");
         }
         postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.SAVED));

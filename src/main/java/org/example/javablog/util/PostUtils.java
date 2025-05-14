@@ -1,27 +1,22 @@
 package org.example.javablog.util;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.repository.PostRelationshipRepository;
 import org.example.javablog.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.example.javablog.dto.PostDTO;
 
 @Component
-public class PostUtil {
-    private final PostRepository postRepository;
-    private final PostRelationshipRepository postRelationshipRepository;
+public class PostUtils {
+    @Autowired
+    private  PostRepository postRepository;
+    @Autowired
+    private  PostRelationshipRepository postRelationshipRepository;
 
-    public PostUtil(PostRepository postRepository, PostRelationshipRepository postRelationshipRepository){
-        this.postRepository = postRepository;
-        this.postRelationshipRepository = postRelationshipRepository;
-    }
 
-    public boolean exists(Long postId){
-        return postRepository.existsById(postId);
-    }
     public boolean validateOwnership(Long userId,Long postId){
-        if (!this.exists(postId)){
+        if (!postRepository.existsById(postId)){
             return false;
         }
         Long authorId = postRepository.findAuthorIdById(postId);

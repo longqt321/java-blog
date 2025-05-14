@@ -1,7 +1,9 @@
 package org.example.javablog.services;
 
 import org.example.javablog.constant.UserRelationshipType;
+import org.example.javablog.model.Post;
 import org.example.javablog.model.UserRelationship;
+import org.example.javablog.repository.PostRepository;
 import org.example.javablog.repository.UserRelationshipRepository;
 import org.springframework.security.core.Authentication;
 import org.example.javablog.dto.UserDTO;
@@ -17,13 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.example.javablog.util.UserUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PostRepository postRepository;
 
     @Autowired
     private UserRelationshipRepository userRelationshipRepository;
@@ -32,8 +38,31 @@ public class UserService {
     private UserUtils userUtils;
 
     public List<UserDTO> getAllUsers() {
-        return UserMapper.toDTOList(userRepository.findAll()).stream().map(userDTO -> {
-            userUtils.enrichUserDTO(userDTO);
+        List<User> users = userRepository.findAll();
+        List<Long> userIds = users.stream().map(User::getId).toList();
+
+        Map<Long, Long> followerCountMap = userRepository.countFollowersByUserIds(userIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        Map<Long, Long> followingCountMap =  userRepository.countFollowingByUserIds(userIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        Map<Long, Long> postCountMap = postRepository.countPostsByAuthorIds(userIds).stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
+        return UserMapper.toDTOList(users).stream().map(userDTO -> {
+            userDTO.setFollowersCount(followerCountMap.getOrDefault(userDTO.getId(), 0L));
+            userDTO.setFollowingCount(followingCountMap.getOrDefault(userDTO.getId(), 0L));
+            userDTO.setPostCount(postCountMap.getOrDefault(userDTO.getId(), 0L));
             return userDTO;
         }).toList();
     }
@@ -51,6 +80,13 @@ public class UserService {
             throw new SecurityException("You are not unauthorized to delete this user");
         }
         userRepository.delete(user);
+    }
+    public UserDTO updateUser(Long userId,UserDTO userDTO) {
+        User updatedUser = userRepository.findById(userId).orElseThrow(NullPointerException::new);
+        updatedUser.setLastName(userDTO.getLastName());
+        updatedUser.setFirstName(userDTO.getFirstName());
+        updatedUser.setDescription(userDTO.getDescription());
+        return UserMapper.toDTO(userRepository.save(updatedUser));
     }
     public boolean isAdmin(Long userID){
         return this.getCurrentUser().getRole().equals(Role.ROLE_ADMIN);

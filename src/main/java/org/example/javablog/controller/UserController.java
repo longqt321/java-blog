@@ -62,7 +62,7 @@ public class UserController {
         }
     }
     @DeleteMapping("/{deletedUserId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long deletedUserId,
+    public ResponseEntity<?> deleteUser(@PathVariable Long deletedUserId,
                                             @RequestParam Long userId){
         try{
             userService.deleteUser(deletedUserId, userId);
@@ -73,6 +73,15 @@ public class UserController {
         }
         catch(NullPointerException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable Long userId, @RequestBody UserDTO user){
+        try{
+            UserDTO updatedUser = userService.updateUser(userId,user);
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"User updated successfully",updatedUser));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
     @PostMapping("/{targetId}/follow")
