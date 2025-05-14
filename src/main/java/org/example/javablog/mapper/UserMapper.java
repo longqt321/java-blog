@@ -7,15 +7,15 @@ import java.util.List;
 
 public class UserMapper {
     public static UserDTO toDTO(User user){
-        return new UserDTO(
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName(),
-                user.getUsername(),
-                user.getDescription(),
-                user.getRole(),
-                user.getCreatedAt()
-        );
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
+        userDTO.setFirstName(user.getFirstName());
+        userDTO.setLastName(user.getLastName());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setDescription(user.getDescription());
+        userDTO.setRole(user.getRole());
+        userDTO.setCreatedAt(user.getCreatedAt());
+        return userDTO;
     }
     public static List<UserDTO> toDTOList(List<User> users) {
         return users.stream().map(UserMapper::toDTO).toList();

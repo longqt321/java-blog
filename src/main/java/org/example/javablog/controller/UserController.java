@@ -115,4 +115,20 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
+    @GetMapping("/{userId}/followers")
+    public ResponseEntity<?> getFollowerCount(@PathVariable Long userId){
+        try{
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"Follower count retrieved successfully",userService.getFollowerCount(userId)));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @GetMapping("/{userId}/following")
+    public ResponseEntity<?> getFollowingCount(@PathVariable Long userId){
+        try{
+            return ResponseEntity.ok().body(new ApiResponse<>(true,"Following count retrieved successfully",userService.getFollowingCount(userId)));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
 }

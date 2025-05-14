@@ -61,10 +61,10 @@ public class PostSpecification {
     private static Specification<Post> hasAuthorName(String authorName) {
         return (root, query, cb) -> {
             Expression<String> fullName = cb.concat(
-                    cb.lower(root.get("author").get("firstName")),
+                    cb.lower(root.get("author").get("lastName")),
                     cb.literal(" ")
             );
-            Expression<String> fullNameCombined = cb.concat(fullName, cb.lower(root.get("author").get("lastName")));
+            Expression<String> fullNameCombined = cb.concat(fullName, cb.lower(root.get("author").get("firstName")));
 
             return cb.like(fullNameCombined, "%" + authorName.toLowerCase() + "%");
         };

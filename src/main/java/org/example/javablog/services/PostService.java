@@ -86,10 +86,10 @@ public class PostService {
         blogRepository.delete(post);
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){
-//        UserDTO user = userService.getCurrentUser();
-//        if (filter.getUsername() == null || !user.getUsername().equals(filter.getUsername())){
-//            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
-//        }
+        Long userId = userService.getCurrentUser().getId();
+        if (filter.getAuthorId() == null || !userId.equals(filter.getAuthorId())){ // Neu user khong phai author thi chi return public posts
+            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
+        }
         Specification<Post> spec = PostSpecification.filterBy(filter);
         return postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
     }
@@ -132,5 +132,18 @@ public class PostService {
     @Transactional
     public void unreportPost(Long userId,Long postId){
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.REPORTED);
+    }
+    public void savePost(Long userId,Long postId){
+        if (postUtil.existsByRelationship(userId,postId,PostRelationshipType.SAVED)){
+            return;
+        }
+        if (postUtil.validateOwnership(userId,postId)){
+            throw new IllegalArgumentException("You cannot save your own posts");
+        }
+        postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.SAVED));
+    }
+    @Transactional
+    public void unsavePost(Long userId,Long postId){
+        postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.SAVED);
     }
 }

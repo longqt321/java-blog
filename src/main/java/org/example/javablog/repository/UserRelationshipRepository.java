@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface UserRelationshipRepository  extends JpaRepository<UserRelationship, Long> {
     void deleteBySourceUserIdAndTargetUserIdAndUserRelationshipType(Long sourceId, Long targetId, UserRelationshipType type);
     boolean existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(Long sourceId, Long targetId, UserRelationshipType type);
+    Long countBySourceUserIdAndUserRelationshipType(Long sourceId, UserRelationshipType type);
+    Long countByTargetUserIdAndUserRelationshipType(Long targetId, UserRelationshipType type);
 }

@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.example.javablog.util.UserUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,11 +28,19 @@ public class UserService {
     @Autowired
     private UserRelationshipRepository userRelationshipRepository;
 
+    @Autowired
+    private UserUtils userUtils;
+
     public List<UserDTO> getAllUsers() {
-        return UserMapper.toDTOList(userRepository.findAll());
+        return UserMapper.toDTOList(userRepository.findAll()).stream().map(userDTO -> {
+            userUtils.enrichUserDTO(userDTO);
+            return userDTO;
+        }).toList();
     }
     public UserDTO getUserById(Long id) {
-        return UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
+        UserDTO userDTO = UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
+        userUtils.enrichUserDTO(userDTO);
+        return userDTO;
     }
     public UserDTO getUserByUsername(String username){
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findByUsername(username).orElse(null)));
@@ -44,18 +53,18 @@ public class UserService {
         userRepository.delete(user);
     }
     public boolean isAdmin(Long userID){
-        return userRepository.findById(userID)
-                .map(user -> user.getRole() == Role.ROLE_ADMIN)
-                .orElse(false);
+        return this.getCurrentUser().getRole().equals(Role.ROLE_ADMIN);
     }
     public void followUser(Long sourceId,Long targetId){
         if (sourceId.equals(targetId)) return;
         if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.FOLLOWING)){
             throw new SecurityException("You are already following this user");
         }
+        // sourceUser is block targetUser
         if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.BLOCKING)){
             throw new SecurityException("You are blocking this user");
         }
+
         userRelationshipRepository.save(UserRelationship.fromIds(sourceId, targetId, UserRelationshipType.FOLLOWING));
     }
     @Transactional
@@ -71,9 +80,8 @@ public class UserService {
         if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.BLOCKING)){
             throw new SecurityException("You are already blocking this user");
         }
-        if (userRelationshipRepository.existsBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId, targetId, UserRelationshipType.FOLLOWING)){
-            this.unfollowUser(sourceId, targetId);
-        }
+        userRelationshipRepository.deleteBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId,targetId,UserRelationshipType.FOLLOWING); // Delete the following relationship if it exists
+
         userRelationshipRepository.save(UserRelationship.fromIds(sourceId, targetId, UserRelationshipType.BLOCKING));
     }
     @Transactional
@@ -82,6 +90,12 @@ public class UserService {
             throw new SecurityException("You are not blocking this user");
         }
         userRelationshipRepository.deleteBySourceUserIdAndTargetUserIdAndUserRelationshipType(sourceId,targetId,UserRelationshipType.BLOCKING);
+    }
+    public Long getFollowerCount(Long userId){
+        return userRelationshipRepository.countByTargetUserIdAndUserRelationshipType(userId, UserRelationshipType.FOLLOWING);
+    }
+    public Long getFollowingCount(Long userId){
+        return userRelationshipRepository.countBySourceUserIdAndUserRelationshipType(userId, UserRelationshipType.FOLLOWING);
     }
 
     public UserDTO getCurrentUser(){

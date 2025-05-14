@@ -1,12 +1,12 @@
 package org.example.javablog.controller;
 
 
-import org.apache.coyote.Response;
 import org.example.javablog.dto.*;
 
 import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
 
+import org.example.javablog.util.UserUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -24,6 +24,8 @@ public class PostController {
  
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserUtils userUtils;
 
     @GetMapping
     public ResponseEntity<?> getPosts(
@@ -62,6 +64,7 @@ public class PostController {
                 postPage.getTotalPages(),
                 postPage.isFirst(),
                 postPage.isLast());
+
         ApiResponse<PageResponse<PostDTO>> response = new ApiResponse<>(true, "Posts retrieved successfully",pageResponse);
         return ResponseEntity.ok(response);
     }
@@ -162,6 +165,26 @@ public class PostController {
             Long userId = userService.getCurrentUser().getId();
             postService.unreportPost(userId,postId);
             return ResponseEntity.ok(new ApiResponse<>(true,"Unreport post successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/save")
+    public ResponseEntity<?> savePost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.savePost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Save post successfully",null));
+        }catch(Exception e){
+            return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/{postId}/unsave")
+    public ResponseEntity<?> unsavePost(@PathVariable Long postId){
+        try{
+            Long userId = userService.getCurrentUser().getId();
+            postService.unsavePost(userId,postId);
+            return ResponseEntity.ok(new ApiResponse<>(true,"Unsave post successfully",null));
         }catch(Exception e){
             return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
         }
