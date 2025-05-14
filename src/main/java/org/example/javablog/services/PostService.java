@@ -77,16 +77,16 @@ public class PostService {
     public void deletePost(Long postId, Long userId) {
         Post post = blogRepository.findById(postId).orElseThrow(NullPointerException::new);
 
-        if (!post.getAuthor().getId().equals(userId) || !userService.isAdmin(userId)) {
+        if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin(userId)) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
         blogRepository.delete(post);
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){
-        Long userId = userService.getCurrentUser().getId();
-        if (filter.getAuthorId() == null || !userId.equals(filter.getAuthorId())){ // Neu user khong phai author thi chi return public posts
-            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
-        }
+//        Long userId = userService.getCurrentUser().getId();
+//        if (filter.getAuthorId() == null || !userId.equals(filter.getAuthorId())){ // Neu user khong phai author thi chi return public posts
+//            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
+//        }
         Specification<Post> spec = PostSpecification.filterBy(filter);
         return postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
     }

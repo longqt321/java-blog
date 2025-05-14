@@ -32,6 +32,7 @@ public class PostController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) List<String> hashtags,
             @RequestParam(required = false) String author,
+            @RequestParam(required = false) String username,
             @RequestParam(required = false) String visibility,
             @RequestParam(required = false) Long authorId,
             @RequestParam(required = false) Long userId,
@@ -48,6 +49,8 @@ public class PostController {
         filter.setAuthorId(authorId);
         filter.setVisibility(visibility);
         filter.setRelationshipType(relationshipType);
+        filter.setUsername(username);
+
 
 
         String prop = sortBy.split(",")[0];

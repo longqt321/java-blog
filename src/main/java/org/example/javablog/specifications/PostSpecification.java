@@ -14,23 +14,26 @@ import java.util.List;
 public class PostSpecification {
     public static Specification<Post> filterBy(PostFilterRequest filter){
         Specification<Post> spec = Specification.where(null);
-        if (filter.getTitle() != null) {
+        if (filter.getTitle() != null && !filter.getTitle().isEmpty()) {
             spec = spec.and(hasTitle(filter.getTitle()));
         }
         if (filter.getHashtags() != null && !filter.getHashtags().isEmpty()) {
             spec = spec.and(hasHashtags(filter.getHashtags()));
         }
-        if (filter.getAuthorName() != null) {
+        if (filter.getAuthorName() != null && !filter.getAuthorName().isEmpty()) {
             spec = spec.and(hasAuthorName(filter.getAuthorName()));
         }
-        if (filter.getVisibility() != null) {
+        if (filter.getVisibility() != null  && !filter.getVisibility().isEmpty()) {
             spec = spec.and(hasVisibility(filter.getVisibility()));
         }
-        if (filter.getRelationshipType() != null && filter.getUserId() != null) {
+        if (filter.getRelationshipType() != null && !filter.getRelationshipType().isEmpty()  && filter.getUserId() != null   ) {
             spec = spec.and(hasRelationship(filter.getRelationshipType(), filter.getUserId()));
         }
-        if (filter.getAuthorId() != null) {
+        if (filter.getAuthorId() != null && filter.getAuthorId() > 0) {
             spec = spec.and(hasAuthorId(filter.getAuthorId()));
+        }
+        if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
+            spec = spec.and(hasUsername(filter.getUsername()));
         }
 
 
@@ -74,6 +77,9 @@ public class PostSpecification {
     }
     private static Specification<Post> hasAuthorId(Long userId) {
         return (root, query, cb) -> cb.equal(root.get("author").get("id"), userId);
+    }
+    private static Specification<Post> hasUsername(String username) {
+        return (root, query, cb) -> cb.equal(root.get("author").get("username"), username);
     }
     private static Specification<Post> hasRelationship(String relationship, Long userId) {
         return (root, query, cb) -> {
