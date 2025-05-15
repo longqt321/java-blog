@@ -18,7 +18,7 @@ public class PostMapper {
                 post.getVisibility(),
                 post.getCreatedAt(),
                 getHashtagNames(post.getHashtags()),
-                false // Default value - Always need to be set later <- Unable to create this method without it.
+                null // PostRelationshipDTO - Not needed for now
         );
     }
     public static List<PostDTO> toDTOList(List<Post> posts) {

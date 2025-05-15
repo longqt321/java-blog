@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.javablog.constant.Visibility;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -20,5 +19,5 @@ public class PostDTO {
     private Visibility visibility;
     private LocalDateTime createdAt;
     private Set<String> hashtags;
-    private boolean liked;
+    private PostRelationshipDTO relationship;
 }

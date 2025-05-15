@@ -48,4 +48,5 @@ public class PostRelationship extends BaseEntity{
                 .postRelationshipType(postRelationshipType)
                 .build();
     }
+
 }

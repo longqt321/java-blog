@@ -4,10 +4,10 @@ import jakarta.transaction.Transactional;
 import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.dto.PostFilterRequest;
+import org.example.javablog.dto.PostRelationshipDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
-import org.example.javablog.constant.Visibility;
 import org.example.javablog.model.PostRelationship;
 import org.example.javablog.repository.PostRelationshipRepository;
 import org.example.javablog.repository.PostRepository;
@@ -19,8 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -87,8 +86,35 @@ public class PostService {
 //        if (filter.getAuthorId() == null || !userId.equals(filter.getAuthorId())){ // Neu user khong phai author thi chi return public posts
 //            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
 //        }
+
+
         Specification<Post> spec = PostSpecification.filterBy(filter);
-        return postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
+        Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
+
+        List<Long> postIds = posts.getContent().stream()
+                .map(PostDTO::getId)
+                .toList();
+        List<PostRelationship> postRelationships = postRelationshipRepository.findByUserIdAndPostIdIn(userService.getCurrentUser().getId(),postIds);
+
+        Map<Long, PostRelationshipDTO> relMap = postRelationships.stream()
+                .collect(Collectors.groupingBy(
+                        pr -> pr.getPost().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.mapping(PostRelationship::getPostRelationshipType, Collectors.toSet()),
+                                set -> new PostRelationshipDTO(
+                                        set.contains(PostRelationshipType.LIKED),
+                                        set.contains(PostRelationshipType.SAVED),
+                                        set.contains(PostRelationshipType.HIDDEN),
+                                        set.contains(PostRelationshipType.REPORTED)
+                                )
+                        )));
+
+        posts.forEach(dto -> {
+            dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
+
+        });
+
+        return posts;
     }
 
     public void likePost(Long userId,Long postId){

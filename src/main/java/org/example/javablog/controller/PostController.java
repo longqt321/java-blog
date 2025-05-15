@@ -60,6 +60,9 @@ public class PostController {
 
         Pageable pageable = PageRequest.of(page, size, sorter);
         Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
+
+
+
         PageResponse<PostDTO> pageResponse = new PageResponse<>(postPage.getContent(),
                 postPage.getNumber(),
                 postPage.getSize(),
