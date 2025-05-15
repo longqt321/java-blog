@@ -111,7 +111,6 @@ public class PostService {
 
         posts.forEach(dto -> {
             dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
-
         });
 
         return posts;
