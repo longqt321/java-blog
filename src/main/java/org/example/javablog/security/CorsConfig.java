@@ -27,7 +27,7 @@ public class CorsConfig {
         config.addAllowedMethod("OPTIONS");
 
         config.addAllowedHeader("*");
-//        config.setAllowCredentials(true);
+        config.setAllowCredentials(true);
 
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
