@@ -6,6 +6,8 @@ import org.example.javablog.dto.UserDTO;
 import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,17 +27,36 @@ public class UserController {
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers();
     }
-    @GetMapping("/current")
-    public ResponseEntity<?> getCurrentUser(){
+    @GetMapping("/search")
+    public ResponseEntity<?> searchUsers( @RequestParam(defaultValue = "0") int page,
+                                          @RequestParam(defaultValue = "10") int size){
         try{
-            return ResponseEntity.ok().body(new ApiResponse<>(true,
-                    "Current logged in user retrieved successfully",
-                    userService.getCurrentUser()
-                    ));
-        }catch(NullPointerException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false,"Unable to retrieve current logged in user",null));
+            Pageable pageable = PageRequest.of(page, size);
+            return ResponseEntity.ok().body(new ApiResponse<>(
+                    true,
+                    "Users retrieved successfully",
+                    userService.searchUsers(pageable)
+            ));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(
+                    false,
+                    e.getMessage(),
+                    null
+            ));
         }
     }
+
+//    @GetMapping("/current")
+//    public ResponseEntity<?> getCurrentUser(){
+//        try{
+//            return ResponseEntity.ok().body(new ApiResponse<>(true,
+//                    "Current logged in user retrieved successfully",
+//                    userService.getCurrentUser()
+//                    ));
+//        }catch(NullPointerException e){
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false,"Unable to retrieve current logged in user",null));
+//        }
+//    }
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
         try{

@@ -41,38 +41,47 @@ public class PostController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sortBy,
             Sort sort) {
-        PostFilterRequest filter = new PostFilterRequest();
-        filter.setTitle(title);
-        filter.setHashtags(hashtags);
-        filter.setAuthorName(author);
-        filter.setUserId(userId);
-        filter.setAuthorId(authorId);
-        filter.setVisibility(visibility);
-        filter.setRelationshipType(relationshipType);
-        filter.setUsername(username);
+
+        try{
+            PostFilterRequest filter = new PostFilterRequest();
+            filter.setTitle(title);
+            filter.setHashtags(hashtags);
+            filter.setAuthorName(author);
+            filter.setUserId(userId);
+            filter.setAuthorId(authorId);
+            filter.setVisibility(visibility);
+            filter.setRelationshipType(relationshipType);
+            filter.setUsername(username);
 
 
 
-        String prop = sortBy.split(",")[0];
-        String direction = sortBy.split(",")[1];
+            String prop = sortBy.split(",")[0];
+            String direction = sortBy.split(",")[1];
 
-        Sort sorter = Sort.by(new Sort.Order(Sort.Direction.fromString(direction), prop));
+            Sort sorter = Sort.by(new Sort.Order(Sort.Direction.fromString(direction), prop));
 
-        Pageable pageable = PageRequest.of(page, size, sorter);
-        Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
+            Pageable pageable = PageRequest.of(page, size, sorter);
+            Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
 
 
 
-        PageResponse<PostDTO> pageResponse = new PageResponse<>(postPage.getContent(),
-                postPage.getNumber(),
-                postPage.getSize(),
-                postPage.getTotalElements(),
-                postPage.getTotalPages(),
-                postPage.isFirst(),
-                postPage.isLast());
+            PageResponse<PostDTO> pageResponse = new PageResponse<>(postPage.getContent(),
+                    postPage.getNumber(),
+                    postPage.getSize(),
+                    postPage.getTotalElements(),
+                    postPage.getTotalPages(),
+                    postPage.isFirst(),
+                    postPage.isLast());
 
-        ApiResponse<PageResponse<PostDTO>> response = new ApiResponse<>(true, "Posts retrieved successfully",pageResponse);
-        return ResponseEntity.ok(response);
+            ApiResponse<PageResponse<PostDTO>> response = new ApiResponse<>(true, "Posts retrieved successfully",pageResponse);
+            return ResponseEntity.ok(response);
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(
+                    false,
+                    e.getMessage(),
+                    null
+            ));
+        }
     }
 
     @GetMapping({"/{id}"})

@@ -5,6 +5,8 @@ import org.example.javablog.model.Post;
 import org.example.javablog.model.UserRelationship;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.repository.UserRelationshipRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.mapper.UserMapper;
@@ -66,6 +68,12 @@ public class UserService {
             return userDTO;
         }).toList();
     }
+    public Page<UserDTO> searchUsers(Pageable pageable){
+        Page<UserDTO> users = userRepository.findAll(pageable).map(UserMapper::toDTO);
+
+        return users;
+    }
+
     public UserDTO getUserById(Long id) {
         UserDTO userDTO = UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
         userUtils.enrichUserDTO(userDTO);
