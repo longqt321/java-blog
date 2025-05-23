@@ -65,7 +65,7 @@ public class ImageService {
             Image image = new Image();
             image.setFileName(fileName);
             image.setHash(hashValue);
-            System.out.println(image.getHash());
+
             return imageRepository.save(image);
         } catch (IOException e) {
             throw new IOException("Failed to store file: " + e.getMessage(), e);

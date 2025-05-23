@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -82,18 +83,18 @@ public class UserController {
             ));
         }
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{deletedUserId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long deletedUserId,
-                                            @RequestParam Long userId){
+    public ResponseEntity<?> deleteUser(@PathVariable Long deletedUserId){
         try{
-            userService.deleteUser(deletedUserId, userId);
+            userService.deleteUser(deletedUserId);
             return ResponseEntity.noContent().build();
         }
         catch (SecurityException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ApiResponse<>(false,e.getMessage(),null));
         }
         catch(NullPointerException e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
     @PutMapping("/{userId}")

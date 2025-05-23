@@ -29,7 +29,7 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String body;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id",nullable = false)
     private User author;
 

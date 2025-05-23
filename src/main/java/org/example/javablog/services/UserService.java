@@ -23,6 +23,7 @@ import org.example.javablog.util.UserUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -82,12 +83,16 @@ public class UserService {
     public UserDTO getUserByUsername(String username){
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findByUsername(username).orElse(null)));
     }
-    public void deleteUser(Long deletedUserId, Long userId) {
-        User user = userRepository.findById(deletedUserId).orElseThrow(NullPointerException::new);
-        if (!deletedUserId.equals(userId) || !isAdmin(userId)) {
-            throw new SecurityException("You are not unauthorized to delete this user");
+    public void deleteUser(Long deletedUserId) {
+        Optional<User> user = userRepository.findById(deletedUserId);
+        if (user.isEmpty()) {
+            throw new NullPointerException("User not found");
         }
-        userRepository.delete(user);
+        if (user.get().getRole() == Role.ROLE_ADMIN) {
+            throw new SecurityException("You cannot delete an admin user");
+        }
+
+        userRepository.delete(user.get());
     }
     public UserDTO updateUser(Long userId,UserDTO userDTO) {
         User updatedUser = userRepository.findById(userId).orElseThrow(NullPointerException::new);
