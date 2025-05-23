@@ -70,7 +70,8 @@ public class UserService {
         }).toList();
     }
     public Page<UserDTO> searchUsers(Pageable pageable){
-        Page<UserDTO> users = userRepository.findAll(pageable).map(UserMapper::toDTO);
+        Long currentUserId = this.getCurrentUser().getId();
+        Page<UserDTO> users = userRepository.findByIdNot(pageable,currentUserId).map(UserMapper::toDTO);
 
         return users;
     }
