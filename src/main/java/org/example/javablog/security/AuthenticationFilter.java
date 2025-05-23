@@ -8,6 +8,7 @@ import org.example.javablog.dto.ApiResponse;
 import org.example.javablog.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -57,6 +58,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                             new UsernamePasswordAuthenticationToken(
                                     userDetails, null, userDetails.getAuthorities());
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    System.out.println("(AUTH FILTER)Auth: " + auth.getAuthorities());
                 }
             }
             else{

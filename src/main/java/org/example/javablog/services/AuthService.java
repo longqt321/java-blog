@@ -11,6 +11,9 @@ import org.example.javablog.repository.UserRepository;
 import org.example.javablog.security.CustomUserDetails;
 import org.example.javablog.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,7 +50,14 @@ public class AuthService {
         Optional<User> user = userRepository.findByUsername(request.getUsername());
         if (user.isPresent()){
             if (passwordEncoder.matches(request.getPassword(), user.get().getPassword())){
+
                 UserDetails userDetails = new CustomUserDetails(user.get());
+                UsernamePasswordAuthenticationToken authToken =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                System.out.println(userDetails.getAuthorities());
                 String accessToken = jwtUtil.generateAccessToken(userDetails);
                 String refreshToken = jwtUtil.generateRefreshToken(userDetails);
 
