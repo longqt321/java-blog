@@ -32,6 +32,12 @@ public class User extends BaseEntity {
 
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "avatar")
+    private Image avatar;
 
     @Column(columnDefinition = "TEXT")
     private String description;

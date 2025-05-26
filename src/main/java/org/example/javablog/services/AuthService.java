@@ -6,6 +6,7 @@ import org.example.javablog.dto.RegisterRequest;
 import org.example.javablog.dto.RegisterResponse;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.constant.Role;
+import org.example.javablog.model.Image;
 import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
 import org.example.javablog.security.CustomUserDetails;
@@ -18,6 +19,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Optional;
 
 @Service
@@ -28,17 +30,29 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtUtil jwtUtil;
+    @Autowired
+    private ImageService imageService;
 
-    public RegisterResponse register(RegisterRequest request){
+    public RegisterResponse register(RegisterRequest request) throws IOException {
         if (userRepository.existsByUsername(request.getUsername())){
+            System.out.println("Username already exists: " + request.getUsername());
             throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmail(request.getEmail())){
+            throw new RuntimeException("Email already exists");
         }
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
         newUser.setFirstName(request.getFirstName());
         newUser.setLastName(request.getLastName());
+        newUser.setEmail(request.getEmail());
         newUser.setRole(Role.ROLE_USER);
+
+        Image avatar = new Image();
+        avatar.setId(1L);
+        newUser.setAvatar(avatar); // Assuming avatar is handled separately
+
         userRepository.save(newUser);
 
         return new RegisterResponse("Register successfully");

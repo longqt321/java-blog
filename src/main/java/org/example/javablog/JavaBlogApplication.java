@@ -34,6 +34,7 @@ public class JavaBlogApplication {
 				user.setRole(Role.ROLE_ADMIN);
 				user.setFirstName("Admin");
 				user.setLastName("Admin");
+				user.setEmail("TESTEMAIL@gmail.com");
 				userRepository.save(user);
 			}
 		};

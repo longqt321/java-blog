@@ -6,7 +6,7 @@ import org.example.javablog.dto.*;
 import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
 
-import org.example.javablog.util.UserUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
@@ -24,8 +24,7 @@ public class PostController {
  
     @Autowired
     private UserService userService;
-    @Autowired
-    private UserUtils userUtils;
+
 
     @GetMapping
     public ResponseEntity<?> getPosts(

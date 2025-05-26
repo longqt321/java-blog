@@ -29,4 +29,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<Object[]> countFollowingByUserIds(@Param("userIds") List<Long> userIds);
 
     Page<User> findByIdNot(Pageable pageable,Long id);
+
+    boolean existsByEmail(String email);
 }

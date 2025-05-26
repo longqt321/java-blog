@@ -87,20 +87,35 @@ public class ImageService {
         }
     }
 
-    private Path getImagePathByFileName(String fileName) throws IOException {
+    public Path getImagePathByFileName(String fileName) throws IOException {
         Optional<Image> optionalImage = imageRepository.findByFileName(fileName);
         if (optionalImage.isEmpty()) {
             throw new IOException("Image not found in database");
         }
 
-        Path path = Paths.get(uploadDir).resolve(fileName).normalize().toAbsolutePath();
-        if (!path.toFile().exists()) {
-            throw new IOException("Image file not found on disk");
-        }
+        return getAbsolutePath(fileName);
+    }
 
+    public Path getImagePathById(Long id) throws IOException {
+        Optional<Image> optionalImage = imageRepository.findById(id);
+        if (optionalImage.isEmpty()) {
+            throw new IOException("Image not found in database");
+        }
+        String fileName = optionalImage.get().getFileName();
+
+        return getAbsolutePath(fileName);
+    }
+    private Path getAbsolutePath(String relativePath) throws IOException {
+        Path path = Paths.get(uploadDir).resolve(relativePath).normalize().toAbsolutePath();
+        if (!Files.exists(path)) {
+            throw new IOException("File not found: " + relativePath);
+        }
         return path;
     }
 
+    public Path getDefaultImagePath() {
+        return Paths.get(uploadDir).resolve("default-avatar.png").normalize().toAbsolutePath();
+    }
 
     private String computeSHA256Hash(MultipartFile file) throws NoSuchAlgorithmException, IOException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");

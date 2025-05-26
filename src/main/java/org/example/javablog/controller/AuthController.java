@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 
 @RestController
 @RequestMapping("/api/auth")
@@ -53,9 +55,11 @@ public class AuthController {
                     .status(HttpStatus.CREATED)
                     .body(response);
         }catch(RuntimeException e) {
-
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) //Should be eResponse.getStatusCode()
+                    .body(new ApiResponse<>(false,e.getMessage(),null));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }

@@ -12,6 +12,7 @@ public class UserMapper {
         userDTO.setFirstName(user.getFirstName());
         userDTO.setLastName(user.getLastName());
         userDTO.setUsername(user.getUsername());
+        userDTO.setEmail(user.getEmail());
         userDTO.setDescription(user.getDescription());
         userDTO.setRole(user.getRole());
         userDTO.setCreatedAt(user.getCreatedAt());

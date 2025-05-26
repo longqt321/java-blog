@@ -3,6 +3,7 @@ package org.example.javablog.dto;
 import lombok.*;
 import org.example.javablog.constant.Role;
 
+import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,9 @@ public class UserDTO {
     private Long followersCount;
     private Long followingCount;
     private Long postCount;
+    private String email;
+    private String avatarUrl;
+    private Long avatarId;
     private Role role;
     private LocalDateTime createdAt;
 }

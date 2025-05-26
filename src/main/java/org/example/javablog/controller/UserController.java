@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -65,6 +66,8 @@ public class UserController {
             return ResponseEntity.ok(user);
         }catch(NullPointerException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
     @GetMapping("/{userId}/blogs")
