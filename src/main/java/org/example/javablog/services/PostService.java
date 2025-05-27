@@ -129,6 +129,7 @@ public class PostService {
     public void unlikePost(Long userId,Long postId){
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.LIKED);
     }
+    @Transactional
     public void hidePost(Long userId,Long postId){
         if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.HIDDEN)){
             return;
@@ -136,12 +137,15 @@ public class PostService {
         if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot hide your own posts");
         }
+        this.unlikePost(userId,postId); // Unliking the post if it was liked
+        this.unsavePost(userId,postId); // Unsaving the post if it was saved
         postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.HIDDEN));
     }
     @Transactional
     public void unhidePost(Long userId,Long postId){
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.HIDDEN);
     }
+    @Transactional
     public void reportPost(Long userId,Long postId){
         if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.REPORTED)){
             return;
@@ -149,6 +153,8 @@ public class PostService {
         if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot report your own posts");
         }
+        this.unlikePost(userId,postId); // Unliking the post if it was liked
+        this.unsavePost(userId,postId); // Unsaving the post if it was saved
         postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.REPORTED));
     }
     @Transactional
