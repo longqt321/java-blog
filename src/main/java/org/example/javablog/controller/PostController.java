@@ -50,7 +50,7 @@ public class PostController {
             filter.setAuthorId(authorId);
             filter.setVisibility(visibility);
             filter.setRelationshipType(relationshipType);
-            filter.setUsername(username);
+            filter.setAuthorUsername(username);
 
 
 

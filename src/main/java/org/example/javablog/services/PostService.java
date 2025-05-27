@@ -9,6 +9,7 @@ import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
 import org.example.javablog.model.PostRelationship;
+import org.example.javablog.constant.Visibility;
 import org.example.javablog.repository.PostRelationshipRepository;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.specifications.PostSpecification;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,12 +45,13 @@ public class PostService {
     @Autowired
     private PostUtils postUtils;
 
+    @Autowired
+    private RecommenderService recommenderService;
+
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
     }
-    public List<PostDTO> getPostsByAuthorId(Long id){
-        return PostMapper.toDTOList(Objects.requireNonNull(blogRepository.findByAuthorId(id)));
-    }
+
     public PostDTO createPost(PostDTO postDTO) {
         Post newPost = new Post();
         newPost.setTitle(postDTO.getTitle());
@@ -81,15 +84,25 @@ public class PostService {
         }
         blogRepository.delete(post);
     }
-    public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable){
-//        Long userId = userService.getCurrentUser().getId();
-//        if (filter.getAuthorId() == null || !userId.equals(filter.getAuthorId())){ // Neu user khong phai author thi chi return public posts
-//            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
-//        }
+    public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable) throws IOException {
+
+
+
+        Long userId = userService.getCurrentUser().getId();
+        if (filter.getAuthorId() == null){
+            filter.setVisibility(String.valueOf(Visibility.PUBLIC));
+        }
+        else{
+            if (!userId.equals(filter.getAuthorId())) {
+                filter.setVisibility(String.valueOf(Visibility.PUBLIC));
+            }
+        }
 
 
         Specification<Post> spec = PostSpecification.filterBy(filter);
         Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
+
+        recommenderService.recommendPosts(posts.stream().toList());
 
         List<Long> postIds = posts.getContent().stream()
                 .map(PostDTO::getId)

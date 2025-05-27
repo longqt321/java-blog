@@ -3,6 +3,7 @@ package org.example.javablog;
 import org.example.javablog.constant.Role;
 import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -22,6 +23,7 @@ public class JavaBlogApplication {
 	private String adminUsername;
 	@Value("${admin.password}")
 	private String adminPassword;
+
 
 	@Bean
 	CommandLineRunner initAdmin(UserRepository userRepository,

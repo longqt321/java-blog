@@ -32,8 +32,8 @@ public class PostSpecification {
         if (filter.getAuthorId() != null && filter.getAuthorId() > 0) {
             spec = spec.and(hasAuthorId(filter.getAuthorId()));
         }
-        if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
-            spec = spec.and(hasUsername(filter.getUsername()));
+        if (filter.getAuthorUsername() != null && !filter.getAuthorUsername().isEmpty()) {
+            spec = spec.and(hasAuthorUsername(filter.getAuthorUsername()));
         }
 
 
@@ -78,7 +78,7 @@ public class PostSpecification {
     private static Specification<Post> hasAuthorId(Long userId) {
         return (root, query, cb) -> cb.equal(root.get("author").get("id"), userId);
     }
-    private static Specification<Post> hasUsername(String username) {
+    private static Specification<Post> hasAuthorUsername(String username) {
         return (root, query, cb) -> cb.equal(root.get("author").get("username"), username);
     }
     private static Specification<Post> hasRelationship(String relationship, Long userId) {

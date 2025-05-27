@@ -70,22 +70,6 @@ public class UserController {
             throw new RuntimeException(e);
         }
     }
-    @GetMapping("/{userId}/blogs")
-    public ResponseEntity<?> getOwnedBlogs(@PathVariable Long userId){
-        try{
-            return ResponseEntity.ok().body(new ApiResponse<>(
-                    true,
-                    "All posts of this user retrieved successfully",
-                    postService.getPostsByAuthorId(userId)
-            ));
-        }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(
-                    false,
-                    e.getMessage(),
-                    null
-            ));
-        }
-    }
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{deletedUserId}")
     public ResponseEntity<?> deleteUser(@PathVariable Long deletedUserId){
