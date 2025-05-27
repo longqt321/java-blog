@@ -161,6 +161,7 @@ public class PostService {
     public void unreportPost(Long userId,Long postId){
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.REPORTED);
     }
+    @Transactional
     public void savePost(Long userId,Long postId){
         if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.SAVED)){
             return;
@@ -168,6 +169,7 @@ public class PostService {
         if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot save your own posts");
         }
+        this.unhidePost(userId,postId); // Unhiding the post if it was hidden
         postRelationshipRepository.save(PostRelationship.fromIds(userId,postId,PostRelationshipType.SAVED));
     }
     @Transactional
