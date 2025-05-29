@@ -6,6 +6,7 @@ import org.example.javablog.constant.Role;
 import java.nio.file.Path;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 
 @Data
@@ -25,4 +26,5 @@ public class UserDTO {
     private Long avatarId;
     private Role role;
     private LocalDateTime createdAt;
+    private Set<String> interests;
 }

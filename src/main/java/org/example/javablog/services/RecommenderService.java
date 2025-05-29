@@ -3,6 +3,7 @@ package org.example.javablog.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.example.javablog.dto.PostDTO;
+import org.example.javablog.dto.RecommenderRequestDTO;
 import org.example.javablog.mapper.PostMapper;
 
 import org.example.javablog.repository.PostRepository;
@@ -23,15 +24,9 @@ public class RecommenderService {
     @Value("${recommender-data-dir}")
     private String recommenderDataPath;
 
-    private static final double HASHTAG_SIMILARITY_WEIGHT = 0.4;
-    private static final double LIKE_RATIO = 0.2;
-    private static final double LIKE_WEIGHT = 0.2;
-    private static final double FOLLOWED_AUTHOR_WEIGHT = 0.3;
-    private static final double BLOCKED_AUTHOR_WEIGHT = 0.2;
-
-    public void recommendPosts(List<PostDTO> posts) throws IOException {
+    public void recommendPosts(List<RecommenderRequestDTO> data) throws IOException {
         String path = recommenderDataPath + File.separator + "input.json";
-        objectMapper.writeValue(new File(path), posts);
+        objectMapper.writeValue(new File(path), data);
         System.out.println("Recommender data written to: " + path);
     }
 }

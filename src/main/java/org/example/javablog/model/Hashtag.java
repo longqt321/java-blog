@@ -26,5 +26,4 @@ public class Hashtag {
 
     @ManyToMany(mappedBy = "hashtags")
     private Set<Post> posts = new HashSet<>();
-
 }

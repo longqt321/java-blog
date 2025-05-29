@@ -5,6 +5,7 @@ import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.dto.PostRelationshipDTO;
+import org.example.javablog.dto.RecommenderRequestDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
@@ -47,6 +48,35 @@ public class PostService {
 
     @Autowired
     private RecommenderService recommenderService;
+
+    public List<PostDTO> getAllPosts() {
+        List<PostDTO> posts = blogRepository.findAll().stream()
+                .map(PostMapper::toDTO)
+                .collect(Collectors.toList());
+        List<Long> postIds = posts.stream()
+                .map(PostDTO::getId)
+                .toList();
+
+        List<PostRelationship> postRelationships = postRelationshipRepository.findByUserIdAndPostIdIn(userService.getCurrentUser().getId(),postIds);
+
+        Map<Long, PostRelationshipDTO> relMap = postRelationships.stream()
+                .collect(Collectors.groupingBy(
+                        pr -> pr.getPost().getId(),
+                        Collectors.collectingAndThen(
+                                Collectors.mapping(PostRelationship::getPostRelationshipType, Collectors.toSet()),
+                                set -> new PostRelationshipDTO(
+                                        set.contains(PostRelationshipType.LIKED),
+                                        set.contains(PostRelationshipType.SAVED),
+                                        set.contains(PostRelationshipType.HIDDEN),
+                                        set.contains(PostRelationshipType.REPORTED)
+                                )
+                        )));
+
+        posts.forEach(dto -> {
+            dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
+        });
+        return posts;
+    }
 
     public PostDTO getPostById(Long id) {
         return PostMapper.toDTO(Objects.requireNonNull(blogRepository.findById(id).orElse(null)));
@@ -102,7 +132,6 @@ public class PostService {
         Specification<Post> spec = PostSpecification.filterBy(filter);
         Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
 
-        recommenderService.recommendPosts(posts.stream().toList());
 
         List<Long> postIds = posts.getContent().stream()
                 .map(PostDTO::getId)

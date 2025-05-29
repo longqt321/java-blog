@@ -1,9 +1,12 @@
 package org.example.javablog.mapper;
 
 import org.example.javablog.dto.UserDTO;
+import org.example.javablog.model.Hashtag;
 import org.example.javablog.model.User;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserMapper {
     public static UserDTO toDTO(User user){
@@ -16,6 +19,9 @@ public class UserMapper {
         userDTO.setDescription(user.getDescription());
         userDTO.setRole(user.getRole());
         userDTO.setCreatedAt(user.getCreatedAt());
+        userDTO.setInterests(user.getInterests().stream()
+                .map(Hashtag::getName)
+                .collect(Collectors.toSet()));
         return userDTO;
     }
     public static List<UserDTO> toDTOList(List<User> users) {
@@ -30,6 +36,7 @@ public class UserMapper {
         user.setDescription(userDTO.getDescription());
         user.setRole(userDTO.getRole());
         user.setCreatedAt(userDTO.getCreatedAt());
+        user.setEmail(userDTO.getEmail());
         return user;
     }
 }
