@@ -4,7 +4,6 @@ package org.example.javablog.controller;
 import org.example.javablog.dto.*;
 
 import org.example.javablog.services.PostService;
-import org.example.javablog.services.RecommenderService;
 import org.example.javablog.services.UserService;
 
 
@@ -26,40 +25,7 @@ public class PostController {
  
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private RecommenderService recommenderService;
-    @PostMapping("/recommend")
-    public ResponseEntity<?> recommendPosts() {
-        try {
-            UserDTO user = userService.getCurrentUser();
-            List<PostDTO> posts = postService.getAllPosts();
-            List<RecommenderRequestDTO> data = posts.stream()
-                    .map(post -> {
-                        PostRelationshipDTO relationship = post.getRelationship();
-                        return new RecommenderRequestDTO(
-                                user.getId(),
-                                post.getId(),
-                                post.getHashtags().stream().toList(),
-                                user.getInterests().stream().toList(),
-                                relationship.isLiked(),
-                                relationship.isSaved(),
-                                relationship.isHidden(),
-                                relationship.isReported(),
-                                true,
-                                false
-                        );
-                    })
-                    .toList();
-            recommenderService.recommendPosts(data);
-
-            return ResponseEntity.ok(new ApiResponse<>(true, "Recommender data processed successfully", data));
-        } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ApiResponse<>(false, "Error processing recommender data: " + e.getMessage(), null));
-        }
-    }
-
-
+    
 
     @GetMapping
     public ResponseEntity<?> getPosts(

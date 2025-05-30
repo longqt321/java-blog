@@ -5,7 +5,6 @@ import org.example.javablog.constant.PostRelationshipType;
 import org.example.javablog.dto.PostDTO;
 import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.dto.PostRelationshipDTO;
-import org.example.javablog.dto.RecommenderRequestDTO;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.mapper.PostMapper;
 import org.example.javablog.model.Post;
@@ -46,8 +45,7 @@ public class PostService {
     @Autowired
     private PostUtils postUtils;
 
-    @Autowired
-    private RecommenderService recommenderService;
+
 
     public List<PostDTO> getAllPosts() {
         List<PostDTO> posts = blogRepository.findAll().stream()
