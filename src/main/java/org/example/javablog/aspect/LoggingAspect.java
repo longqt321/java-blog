@@ -69,8 +69,6 @@ public class LoggingAspect {
         } finally {
             logEntry.setDurationMs(System.currentTimeMillis() - start);
             logEntry.setStatusCode(statusCode);
-            log.info("API Call: {} {} - User ID: {}, Duration: {} ms, Status: {}",
-                    httpMethod, uri, userId, logEntry.getDurationMs(), logEntry.getStatusCode());
             userLogRepository.save(logEntry);
         }
 
