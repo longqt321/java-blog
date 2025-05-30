@@ -100,10 +100,10 @@ public class UserController {
             userService.followUser(sourceId,targetId);
             return ResponseEntity.ok().body(new ApiResponse<>(true,"Followed successfully",null));
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
-    @PostMapping("/{targetId}/unfollow")
+    @DeleteMapping("/{targetId}/follow")
     public ResponseEntity<?> unfollowUser(@PathVariable Long targetId){
         try {
             Long sourceId = userService.getCurrentUser().getId();
@@ -120,10 +120,10 @@ public class UserController {
             userService.blockUser(sourceId,targetId);
             return ResponseEntity.ok().body(new ApiResponse<>(true,"Blocked successfully",null));
         }catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false,e.getMessage(),null));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
-    @PostMapping("/{targetId}/unblock")
+    @DeleteMapping("/{targetId}/block")
     public ResponseEntity<?> unblockUser(@PathVariable Long targetId){
         try{
             Long sourceId = userService.getCurrentUser().getId();

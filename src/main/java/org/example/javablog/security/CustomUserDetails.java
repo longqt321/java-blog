@@ -1,5 +1,6 @@
 package org.example.javablog.security;
 
+import lombok.Getter;
 import org.example.javablog.model.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,5 +29,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getUsername();
+    }
+
+    public Long getId() {
+        return user.getId();
     }
 }

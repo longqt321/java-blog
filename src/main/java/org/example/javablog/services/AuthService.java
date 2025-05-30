@@ -65,7 +65,7 @@ public class AuthService {
         if (user.isPresent()){
             if (passwordEncoder.matches(request.getPassword(), user.get().getPassword())){
 
-                UserDetails userDetails = new CustomUserDetails(user.get());
+                CustomUserDetails userDetails = new CustomUserDetails(user.get());
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails, null, userDetails.getAuthorities());
@@ -88,7 +88,7 @@ public class AuthService {
             String username = jwtUtil.extractUsername(refreshToken);
             Optional<User> user = userRepository.findByUsername(username);
             if (user.isPresent()){
-                UserDetails userDetails = new CustomUserDetails(user.get());
+                CustomUserDetails userDetails = new CustomUserDetails(user.get());
                 return jwtUtil.generateAccessToken(userDetails);
             }else {
                 throw new RuntimeException("Invalid refresh token");

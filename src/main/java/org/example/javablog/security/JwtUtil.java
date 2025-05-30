@@ -40,18 +40,23 @@ public class JwtUtil {
         return getClaimFromToken(token, Claims::getSubject);
     }
 
+    public Long extractUserId(String token){
+        return getClaimFromToken(token, claims -> Long.parseLong(claims.get("userId").toString()));
+    }
+
     public Boolean isTokenExpired(String token){
         final Date expiredDate = getExpirationDateFromToken(token);
         return expiredDate.before(new Date());
     }
 
-    public String generateAccessToken(UserDetails userDetails) {
+    public String generateAccessToken(CustomUserDetails userDetails) {
         Map<String,Object> claims = new HashMap<>();
-
+        claims.put("userId", userDetails.getId());
         return doGenerateToken(claims,userDetails.getUsername(),ACCESS_TOKEN_EXPIRES_IN_MILISECONDS);
     }
-    public String generateRefreshToken(UserDetails userDetails){
+    public String generateRefreshToken(CustomUserDetails userDetails){
         Map<String,Object> claims = new HashMap<>();
+
         if (!validateToken(this.refreshToken)){
             this.refreshToken = doGenerateToken(claims,userDetails.getUsername(),REFRESH_TOKEN_EXPIRES_IN_MILISECONDS);
         }
@@ -85,6 +90,7 @@ public class JwtUtil {
     }
 
     private String doGenerateToken(Map<String,Object> claims,String subject,Long expirationInMilisecond){
+
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
