@@ -26,7 +26,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     private CustomUserDetailsService userDetailsService;
 
     private static final List<String> PUBLIC_PATHS =
-            Arrays.asList("/api/auth/login", "/api/auth/register","/api/auth/refresh");
+            Arrays.asList("/api/auth/login", "/api/auth/register","/api/auth/refresh"
+                    ,"/api/auth/confirm-email","/api/auth/forgot-password");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

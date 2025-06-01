@@ -1,7 +1,6 @@
 package org.example.javablog.aspect;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -35,7 +34,7 @@ public class LoggingAspect {
         String httpMethod = request.getMethod();
         String uri = request.getRequestURI();
 
-        if (uri.startsWith("/api/auth/login") || uri.startsWith("/api/auth/register")) {
+        if (uri.startsWith("/api/auth") ) {
             return joinPoint.proceed(); // bỏ qua logging
         }
 

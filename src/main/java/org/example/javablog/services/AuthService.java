@@ -1,5 +1,6 @@
 package org.example.javablog.services;
 
+import jakarta.mail.MessagingException;
 import org.example.javablog.dto.LoginRequest;
 import org.example.javablog.dto.AuthResponse;
 import org.example.javablog.dto.RegisterRequest;
@@ -11,6 +12,8 @@ import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
 import org.example.javablog.security.CustomUserDetails;
 import org.example.javablog.security.JwtUtil;
+import org.example.javablog.security.OtpCode;
+import org.example.javablog.security.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -31,9 +34,23 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
+    private OtpUtils otpUtils;
+    @Autowired
     private ImageService imageService;
 
-    public RegisterResponse register(RegisterRequest request) throws IOException {
+    @Autowired
+    private EmailService emailService;
+
+    public void confirmEmail(RegisterRequest request) throws MessagingException, IOException {
+        try{
+            emailService.sendRegistrationConfirmEmail(request.getEmail(), request.getUsername());
+        }catch (MessagingException | IOException e) {
+            throw new RuntimeException("Error sending confirmation email: " + e.getMessage(), e);
+        }
+
+    }
+
+    public RegisterResponse register(RegisterRequest request) throws IOException, MessagingException {
         if (userRepository.existsByUsername(request.getUsername())){
             System.out.println("Username already exists: " + request.getUsername());
             throw new RuntimeException("Username already exists");
@@ -41,6 +58,14 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())){
             throw new RuntimeException("Email already exists");
         }
+        if (!request.getPassword().equals(request.getConfirmPassword())){
+            throw new RuntimeException("Password and confirm password do not match");
+        }
+        if (!otpUtils.verifyOtp(request.getEmail(), request.getOtpCode())) {
+            throw new RuntimeException("Invalid OTP code");
+        }
+
+
         User newUser = new User();
         newUser.setUsername(request.getUsername());
         newUser.setPassword(passwordEncoder.encode(request.getPassword()));
@@ -52,6 +77,8 @@ public class AuthService {
         Image avatar = new Image();
         avatar.setId(1L);
         newUser.setAvatar(avatar); // Assuming avatar is handled separately
+
+
 
         userRepository.save(newUser);
 
