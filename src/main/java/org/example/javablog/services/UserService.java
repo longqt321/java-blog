@@ -168,11 +168,9 @@ public class UserService {
         userDTO.setPostCount(postRepository.countByAuthorId(userDTO.getId()));
 
         if (userDTO.getAvatarId() != null) {
-            userDTO.setAvatarUrl(
-                    "http://localhost:8080/api/images/" + imageService.getImagePathById(userDTO.getAvatarId()).getFileName().toString()
-            );
+            userDTO.setAvatarUrl(imageService.getImagePathById(userDTO.getAvatarId()).toString());
         } else {
-            userDTO.setAvatarUrl(imageService.getDefaultImagePath().getFileName().toString());
+            userDTO.setAvatarUrl(imageService.getDefaultImagePath());
         }
     }
 }

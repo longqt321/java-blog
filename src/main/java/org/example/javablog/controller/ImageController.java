@@ -44,17 +44,45 @@ public class ImageController
     }
     @GetMapping("/")
     public ResponseEntity<Resource> getImage(@RequestParam String url) throws IOException {
-        Resource resource = imageService.loadAsResource(url);
+        try {
+            Resource resource = imageService.loadAsResource(url);
 
-        String contentType = Files.probeContentType(resource.getFile().toPath());
-        if (contentType == null) {
-            contentType = "application/octet-stream";
+            // Xác định content type an toàn hơn
+            String contentType = determineContentType(resource);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .header(HttpHeaders.CACHE_CONTROL, "max-age=3600") // Cache 1 giờ
+                    .body(resource);
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
         }
+    }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
+    private String determineContentType(Resource resource) throws IOException {
+        String contentType = Files.probeContentType(resource.getFile().toPath());
+
+        if (contentType == null) {
+            String filename = resource.getFilename();
+            if (filename != null) {
+                String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
+                switch (extension) {
+                    case "jpg":
+                    case "jpeg":
+                        return "image/jpeg";
+                    case "png":
+                        return "image/png";
+                    case "gif":
+                        return "image/gif";
+                    case "webp":
+                        return "image/webp";
+                    default:
+                        return "application/octet-stream";
+                }
+            }
+        }
+        return contentType;
     }
 
 }

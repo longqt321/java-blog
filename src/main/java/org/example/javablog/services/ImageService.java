@@ -73,17 +73,34 @@ public class ImageService {
             throw new NoSuchAlgorithmException("SHA-256 algorithm not found: " + e.getMessage(), e);
         }
     }
-    public Resource loadAsResource(String fileName) throws IOException {
-        Path file = getImagePathByFileName(fileName);
+    public Resource loadAsResource(String url) throws IOException {
+        // Validate đường dẫn
+        url = uploadDir + "/" + url; // Đảm bảo đường dẫn đầy đủ
+        if (url == null || url.trim().isEmpty()) {
+            throw new IOException("File path cannot be null or empty");
+        }
+
+        Path filePath = Paths.get(url);
+
+        // Kiểm tra file tồn tại
+        if (!Files.exists(filePath)) {
+            throw new IOException("File does not exist: " + url);
+        }
+
+        // Kiểm tra quyền đọc
+        if (!Files.isReadable(filePath)) {
+            throw new IOException("File is not readable: " + url);
+        }
+
         try {
-            Resource resource = new UrlResource(file.toUri());
-            if (resource.exists() || resource.isReadable()) {
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() && resource.isReadable()) { // SỬA: && thay vì ||
                 return resource;
             } else {
-                throw new IOException("Could not read the file: " + fileName);
+                throw new IOException("Could not read the file: " + url);
             }
         } catch (MalformedURLException e) {
-            throw new IOException("Invalid file path", e);
+            throw new IOException("Invalid file path: " + url, e);
         }
     }
 
@@ -103,7 +120,7 @@ public class ImageService {
         }
         String fileName = optionalImage.get().getFileName();
 
-        return getAbsolutePath(fileName);
+        return Path.of(fileName);
     }
     private Path getAbsolutePath(String relativePath) throws IOException {
         Path path = Paths.get(uploadDir).resolve(relativePath).normalize().toAbsolutePath();
@@ -113,8 +130,8 @@ public class ImageService {
         return path;
     }
 
-    public Path getDefaultImagePath() {
-        return Paths.get(uploadDir).resolve("default-avatar.png").normalize().toAbsolutePath();
+    public String getDefaultImagePath() throws IOException {
+        return this.getImagePathById(1L).toString();
     }
 
     private String computeSHA256Hash(MultipartFile file) throws NoSuchAlgorithmException, IOException {

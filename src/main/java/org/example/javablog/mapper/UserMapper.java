@@ -22,6 +22,7 @@ public class UserMapper {
         userDTO.setInterests(user.getInterests().stream()
                 .map(Hashtag::getName)
                 .collect(Collectors.toSet()));
+        userDTO.setAvatarId(user.getAvatar().getId());
         return userDTO;
     }
     public static List<UserDTO> toDTOList(List<User> users) {
