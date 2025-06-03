@@ -22,7 +22,6 @@ public class UserDTO {
     private Long followingCount;
     private Long postCount;
     private String email;
-    private String avatarUrl;
     private Long avatarId;
     private Role role;
     private LocalDateTime createdAt;

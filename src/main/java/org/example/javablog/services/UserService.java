@@ -75,7 +75,15 @@ public class UserService {
     }
     public Page<UserDTO> searchUsers(Pageable pageable){
         Long currentUserId = this.getCurrentUser().getId();
-        return userRepository.findByIdNot(pageable,currentUserId).map(UserMapper::toDTO);
+        Page<UserDTO> users = userRepository.findByIdNot(pageable,currentUserId).map(UserMapper::toDTO);
+        users.forEach(userDTO -> {
+            try {
+                this.enrichUserDTO(userDTO);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        return users;
     }
 
     public UserDTO getUserById(Long id) throws IOException {
@@ -166,11 +174,5 @@ public class UserService {
         userDTO.setFollowersCount(userRelationshipRepository.countByTargetUserIdAndUserRelationshipType(userDTO.getId(), UserRelationshipType.FOLLOWING));
         userDTO.setFollowingCount(userRelationshipRepository.countBySourceUserIdAndUserRelationshipType(userDTO.getId(), UserRelationshipType.FOLLOWING));
         userDTO.setPostCount(postRepository.countByAuthorId(userDTO.getId()));
-
-        if (userDTO.getAvatarId() != null) {
-            userDTO.setAvatarUrl(imageService.getImagePathById(userDTO.getAvatarId()).toString());
-        } else {
-            userDTO.setAvatarUrl(imageService.getDefaultImagePath());
-        }
     }
 }

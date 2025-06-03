@@ -73,9 +73,12 @@ public class ImageService {
             throw new NoSuchAlgorithmException("SHA-256 algorithm not found: " + e.getMessage(), e);
         }
     }
-    public Resource loadAsResource(String url) throws IOException {
+    public Resource loadAsResource(Long imageId) throws IOException {
         // Validate đường dẫn
-        url = uploadDir + "/" + url; // Đảm bảo đường dẫn đầy đủ
+        if (imageId == null) {
+            throw new IOException("Image ID cannot be null or empty");
+        }
+        String url = uploadDir + "/" +getImagePathById(imageId).toString();
         if (url == null || url.trim().isEmpty()) {
             throw new IOException("File path cannot be null or empty");
         }

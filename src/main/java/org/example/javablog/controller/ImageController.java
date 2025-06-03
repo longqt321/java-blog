@@ -43,9 +43,9 @@ public class ImageController
         }
     }
     @GetMapping("/")
-    public ResponseEntity<Resource> getImage(@RequestParam String url) throws IOException {
+    public ResponseEntity<Resource> getImage(@RequestParam Long imageId) throws IOException {
         try {
-            Resource resource = imageService.loadAsResource(url);
+            Resource resource = imageService.loadAsResource(imageId);
 
             // Xác định content type an toàn hơn
             String contentType = determineContentType(resource);
