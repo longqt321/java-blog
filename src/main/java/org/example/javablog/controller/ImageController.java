@@ -42,11 +42,10 @@ public class ImageController
                     .body(new ApiResponse<>(false,ex.getMessage(),null));
         }
     }
-    @GetMapping("/{fileName:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String fileName) throws IOException {
-        Resource resource = imageService.loadAsResource(fileName);
+    @GetMapping("/")
+    public ResponseEntity<Resource> getImage(@RequestParam String url) throws IOException {
+        Resource resource = imageService.loadAsResource(url);
 
-        // Detect MIME type (image/png, image/jpeg, etc.)
         String contentType = Files.probeContentType(resource.getFile().toPath());
         if (contentType == null) {
             contentType = "application/octet-stream";
@@ -57,4 +56,5 @@ public class ImageController
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
     }
+
 }

@@ -41,7 +41,10 @@ public class JwtUtil {
     }
 
     public Long extractUserId(String token){
-        return getClaimFromToken(token, claims -> Long.parseLong(claims.get("userId").toString()));
+        return getClaimFromToken(token, claims ->{
+            Object userId = claims.get("userId");
+            return userId != null ? Long.parseLong(userId.toString()) : null;
+        });
     }
 
     public Boolean isTokenExpired(String token){
