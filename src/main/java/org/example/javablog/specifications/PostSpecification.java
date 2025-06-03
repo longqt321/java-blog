@@ -79,7 +79,7 @@ public class PostSpecification {
         return (root, query, cb) -> cb.equal(root.get("author").get("id"), userId);
     }
     private static Specification<Post> hasAuthorUsername(String username) {
-        return (root, query, cb) -> cb.equal(root.get("author").get("username"), username);
+        return (root, query, cb) -> cb.like(root.get("author").get("username"), "%" + username + "%");
     }
     private static Specification<Post> hasRelationship(String relationship, Long userId) {
         return (root, query, cb) -> {
