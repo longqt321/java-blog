@@ -44,7 +44,7 @@ public class EmailService {
                 .replace("{{OTP_CODE}}", otpUtils.generateOtp(to));
 
         helper.setTo(to);
-        helper.setSubject("Registration Confirmation");
+        helper.setSubject("OTP code from WeKnowWeShare");
         helper.setText(htmlContent, true); // true => HTML
 
         mailSender.send(message);
