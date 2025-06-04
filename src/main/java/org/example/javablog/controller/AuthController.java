@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class AuthController {
     }
 
     @PostMapping("/confirm-email")
-    public void confirmEmail(@RequestBody RegisterRequest request){
+    public void confirmEmail(@RequestBody EmailConfirmRequest request){
         try {
             authService.confirmEmail(request);
         } catch (MessagingException | IOException e) {
@@ -89,6 +90,17 @@ public class AuthController {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new ApiResponse<>(false,e.getMessage(),null));
+        }
+    }
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            authService.resetPassword(request);
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(new ApiResponse<>(true, "Password reset successfully", null));
+        } catch (RuntimeException | IOException | MessagingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new ApiResponse<>(false, e.getMessage(), null));
         }
     }
 }

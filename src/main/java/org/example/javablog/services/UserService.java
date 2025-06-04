@@ -45,24 +45,24 @@ public class UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         List<Long> userIds = users.stream().map(User::getId).toList();
-
-        Map<Long, Long> followerCountMap = userRepository.countFollowersByUserIds(userIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
-
-        Map<Long, Long> followingCountMap =  userRepository.countFollowingByUserIds(userIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
-
-        Map<Long, Long> postCountMap = postRepository.countPostsByAuthorIds(userIds).stream()
-                .collect(Collectors.toMap(
-                        row -> (Long) row[0],
-                        row -> (Long) row[1]
-                ));
+// Code below is supposed to be used to improve performance by reducing the number of queries
+//        Map<Long, Long> followerCountMap = userRepository.countFollowersByUserIds(userIds).stream()
+//                .collect(Collectors.toMap(
+//                        row -> (Long) row[0],
+//                        row -> (Long) row[1]
+//                ));
+//
+//        Map<Long, Long> followingCountMap =  userRepository.countFollowingByUserIds(userIds).stream()
+//                .collect(Collectors.toMap(
+//                        row -> (Long) row[0],
+//                        row -> (Long) row[1]
+//                ));
+//
+//        Map<Long, Long> postCountMap = postRepository.countPostsByAuthorIds(userIds).stream()
+//                .collect(Collectors.toMap(
+//                        row -> (Long) row[0],
+//                        row -> (Long) row[1]
+//                ));
 
         return UserMapper.toDTOList(users).stream().map(userDTO -> {
             try {

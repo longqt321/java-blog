@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Random;
 
 @Service
 public class EmailService {
@@ -34,7 +33,7 @@ public class EmailService {
          message.setText(body);
          mailSender.send(message);
     }
-    public void sendRegistrationConfirmEmail(String to, String username) throws MessagingException, IOException {
+    public void sendEmail(String to, String username) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
@@ -52,7 +51,7 @@ public class EmailService {
     }
 
     private String loadEmailTemplate() throws IOException {
-        Resource resource = resourceLoader.getResource("classpath:templates/" + "registration_confirm.html");
+        Resource resource = resourceLoader.getResource("classpath:templates/" + "email_template.html");
         return Files.readString(resource.getFile().toPath(), StandardCharsets.UTF_8);
     }
 }

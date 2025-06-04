@@ -1,10 +1,7 @@
 package org.example.javablog.services;
 
 import jakarta.mail.MessagingException;
-import org.example.javablog.dto.LoginRequest;
-import org.example.javablog.dto.AuthResponse;
-import org.example.javablog.dto.RegisterRequest;
-import org.example.javablog.dto.RegisterResponse;
+import org.example.javablog.dto.*;
 import org.example.javablog.mapper.UserMapper;
 import org.example.javablog.constant.Role;
 import org.example.javablog.model.Image;
@@ -12,13 +9,10 @@ import org.example.javablog.model.User;
 import org.example.javablog.repository.UserRepository;
 import org.example.javablog.security.CustomUserDetails;
 import org.example.javablog.security.JwtUtil;
-import org.example.javablog.security.OtpCode;
 import org.example.javablog.security.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +35,37 @@ public class AuthService {
     @Autowired
     private EmailService emailService;
 
-    public void confirmEmail(RegisterRequest request) throws MessagingException, IOException {
+    public void resetPassword(ResetPasswordRequest request) throws IOException, MessagingException {
+        if (!userRepository.existsByUsername(request.getUsername())){
+            throw new RuntimeException("User not found");
+        }
+        if (!request.getNewPassword().equals(request.getConfirmPassword())){
+            throw new RuntimeException("New password and confirm new password do not match");
+        }
+        String email = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"))
+                .getEmail();
+        if (!otpUtils.verifyOtp(email, request.getOtpCode())) {
+            throw new RuntimeException("Invalid OTP code");
+        }
+
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public void confirmEmail(EmailConfirmRequest request) throws MessagingException, IOException {
         try{
-            emailService.sendRegistrationConfirmEmail(request.getEmail(), request.getUsername());
+            if (request.getEmail().isEmpty()){
+                request.setEmail(userRepository.findByUsername(request.getUsername())
+                        .orElseThrow(() -> new RuntimeException("User not found"))
+                        .getEmail());
+            }
+            emailService.sendEmail(request.getEmail(), request.getUsername());
         }catch (MessagingException | IOException e) {
             throw new RuntimeException("Error sending confirmation email: " + e.getMessage(), e);
         }
-
     }
 
     public RegisterResponse register(RegisterRequest request) throws IOException, MessagingException {
