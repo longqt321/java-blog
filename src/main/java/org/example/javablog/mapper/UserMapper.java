@@ -2,6 +2,7 @@ package org.example.javablog.mapper;
 
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.model.Hashtag;
+import org.example.javablog.model.Image;
 import org.example.javablog.model.User;
 
 import java.util.HashSet;
@@ -38,6 +39,9 @@ public class UserMapper {
         user.setRole(userDTO.getRole());
         user.setCreatedAt(userDTO.getCreatedAt());
         user.setEmail(userDTO.getEmail());
+        Image avatar = new Image();
+        avatar.setId(userDTO.getAvatarId());
+        user.setAvatar(avatar);
         return user;
     }
 }
