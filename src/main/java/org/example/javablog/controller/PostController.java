@@ -134,7 +134,7 @@ public class PostController {
             return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
-    @PostMapping("/{postId}/unlike")
+    @DeleteMapping("/{postId}/like")
     public ResponseEntity<?> unlikePost(@PathVariable Long postId){
         try{
             Long userId = userService.getCurrentUser().getId();
@@ -154,7 +154,7 @@ public class PostController {
             return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
-    @PostMapping("/{postId}/unhide")
+    @DeleteMapping("/{postId}/hide")
     public ResponseEntity<?> unhidePost(@PathVariable Long postId){
         try{
             Long userId = userService.getCurrentUser().getId();
@@ -174,7 +174,7 @@ public class PostController {
             return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
-    @PostMapping("/{postId}/unreport")
+    @DeleteMapping("/{postId}/report")
     public ResponseEntity<?> unreportPost(@PathVariable Long postId){
         try{
             Long userId = userService.getCurrentUser().getId();
@@ -194,7 +194,7 @@ public class PostController {
             return  ResponseEntity.badRequest().body(new ApiResponse<>(false,e.getMessage(),null));
         }
     }
-    @PostMapping("/{postId}/unsave")
+    @DeleteMapping("/{postId}/save")
     public ResponseEntity<?> unsavePost(@PathVariable Long postId){
         try{
             Long userId = userService.getCurrentUser().getId();

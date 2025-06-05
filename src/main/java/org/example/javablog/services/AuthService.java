@@ -95,9 +95,7 @@ public class AuthService {
         Image avatar = new Image();
         avatar.setId(1L);
         newUser.setAvatar(avatar); // Assuming avatar is handled separately
-
-
-
+        
         userRepository.save(newUser);
 
         return new RegisterResponse("Register successfully");
