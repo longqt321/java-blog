@@ -114,8 +114,6 @@ public class PostService {
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable) throws IOException {
 
-
-
         Long userId = userService.getCurrentUser().getId();
         if (filter.getAuthorId() == null){
             filter.setVisibility(String.valueOf(Visibility.PUBLIC));
@@ -127,7 +125,11 @@ public class PostService {
         }
 
 
-        Specification<Post> spec = PostSpecification.filterBy(filter);
+        Specification<Post> spec = Specification.where(PostSpecification.filterBy(filter))
+                .and(PostSpecification.excludeByHiddenAndReported(userId))
+                .and(PostSpecification.sortByRecommendScore(userId))
+                .and(PostSpecification.excludeByBlocked(userId));
+
         Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
 
 

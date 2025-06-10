@@ -2,13 +2,14 @@ package org.example.javablog.specifications;
 
 import jakarta.persistence.criteria.*;
 import org.example.javablog.constant.PostRelationshipType;
+import org.example.javablog.constant.UserRelationshipType;
 import org.example.javablog.dto.PostFilterRequest;
-import org.example.javablog.model.Hashtag;
-import org.example.javablog.model.Post;
-import org.example.javablog.model.PostRelationship;
+import org.example.javablog.model.*;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class PostSpecification {
@@ -100,5 +101,63 @@ public class PostSpecification {
             return root.get("id").in(subquery);
         };
     }
+    public static Specification<Post> excludeByHiddenAndReported(Long userId) {
+        return (root, query, cb) -> {
+
+            assert query != null;
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<PostRelationship> relRoot = subquery.from(PostRelationship.class);
+
+            subquery.select(relRoot.get("post").get("id"))
+                    .where(
+                            cb.equal(relRoot.get("user").get("id"), userId),
+                            relRoot.get("postRelationshipType").in(List.of(
+                                    PostRelationshipType.HIDDEN,
+                                    PostRelationshipType.REPORTED
+                            ))
+                    );
+
+            return cb.not(root.get("id").in(subquery));
+        };
+    }
+    public static Specification<Post> excludeByBlocked(Long currentUserId) {
+        return (root, query, cb) -> {
+            assert query != null;
+
+            // Subquery: lấy tất cả các user mà currentUserId đã block
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<UserRelationship> relRoot = subquery.from(UserRelationship.class);
+            subquery.select(relRoot.get("targetUser").get("id"))
+                    .where(
+                            cb.equal(relRoot.get("sourceUser").get("id"), currentUserId),
+                            cb.equal(relRoot.get("userRelationshipType"), UserRelationshipType.BLOCKING)
+                    );
+
+            // Trả về: loại bỏ các bài post có author.id nằm trong danh sách block
+            return cb.not(root.get("author").get("id").in(subquery));
+        };
+    }
+
+    public static Specification<Post> sortByRecommendScore(Long userId) {
+        return (root, query, cb) -> {
+
+            // Thêm JOIN thủ công thông qua tên bảng (bằng cách dùng subquery hoặc trực tiếp)
+            assert query != null;
+            Subquery<BigDecimal> subquery = query.subquery(BigDecimal.class);
+            Root<RecommendScore> recommendRoot = subquery.from(RecommendScore.class);
+            subquery.select(recommendRoot.get("score"))
+                    .where(
+                    cb.equal(recommendRoot.get("postId"), root.get("id")),
+                    cb.equal(recommendRoot.get("userId"), userId)
+            );
+
+            // Sắp xếp theo subquery
+            query.orderBy(cb.desc(subquery));
+
+            // Trả về không có filter cụ thể, chỉ sắp xếp
+            return cb.conjunction();
+        };
+    }
+
 
 }

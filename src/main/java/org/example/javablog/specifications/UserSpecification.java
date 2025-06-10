@@ -27,8 +27,8 @@ public class UserSpecification {
     private static Specification<User> hasFullName(String fullName) {
         return (root, query, cb) -> {
             Expression<String> fullNameExpression = cb.concat(
-                    cb.concat(cb.lower(root.get("firstName")), " "),
-                    cb.lower(root.get("lastName"))
+                    cb.concat(cb.lower(root.get("lastName")), " "),
+                    cb.lower(root.get("firstName"))
             );
             return cb.like(fullNameExpression, "%" + fullName.toLowerCase() + "%");
         };
