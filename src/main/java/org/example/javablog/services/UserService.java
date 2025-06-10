@@ -1,6 +1,7 @@
 package org.example.javablog.services;
 
 import org.example.javablog.constant.UserRelationshipType;
+import org.example.javablog.model.Image;
 import org.example.javablog.model.Post;
 import org.example.javablog.model.UserRelationship;
 import org.example.javablog.repository.ImageRepository;
@@ -110,6 +111,10 @@ public class UserService {
         updatedUser.setLastName(userDTO.getLastName());
         updatedUser.setFirstName(userDTO.getFirstName());
         updatedUser.setDescription(userDTO.getDescription());
+        updatedUser.setEmail(userDTO.getEmail());
+        Image avatar = new Image();
+        avatar.setId(userDTO.getAvatarId());
+        updatedUser.setAvatar(avatar);
         return UserMapper.toDTO(userRepository.save(updatedUser));
     }
     public boolean isAdmin(Long userID){

@@ -97,7 +97,7 @@ public class ImageService {
 
         try {
             Resource resource = new UrlResource(filePath.toUri());
-            if (resource.exists() && resource.isReadable()) { // SỬA: && thay vì ||
+            if (resource.exists() && resource.isReadable()) {
                 return resource;
             } else {
                 throw new IOException("Could not read the file: " + url);

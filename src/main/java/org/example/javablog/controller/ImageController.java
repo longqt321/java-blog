@@ -35,8 +35,8 @@ public class ImageController
                 return ResponseEntity.badRequest().body(new ApiResponse<>(true,"Invalid file: only image files are allowed.",null));
             }
 
-            String savedPath = imageService.storeFile(file).getFileName();
-            return ResponseEntity.ok(new ApiResponse<>(true,"File uploaded successfully", savedPath));
+            Long savedId = imageService.storeFile(file).getId();
+            return ResponseEntity.ok(new ApiResponse<>(true,"File uploaded successfully", savedId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ApiResponse<>(false,ex.getMessage(),null));
@@ -47,7 +47,6 @@ public class ImageController
         try {
             Resource resource = imageService.loadAsResource(imageId);
 
-            // Xác định content type an toàn hơn
             String contentType = determineContentType(resource);
 
             return ResponseEntity.ok()
@@ -69,6 +68,7 @@ public class ImageController
                 String extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
                 switch (extension) {
                     case "jpg":
+                        return "image/jpg";
                     case "jpeg":
                         return "image/jpeg";
                     case "png":
