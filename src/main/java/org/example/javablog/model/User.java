@@ -23,10 +23,10 @@ public class User extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     private String firstName;
 
-    @Column(nullable = false, length = 10)
+    @Column(nullable = false, length = 20)
     private String lastName;
 
     @Column(length = 20, unique = true,nullable = false)
