@@ -107,7 +107,7 @@ public class PostService {
     public void deletePost(Long postId, Long userId) {
         Post post = blogRepository.findById(postId).orElseThrow(NullPointerException::new);
 
-        if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin(userId)) {
+        if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin()) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
         blogRepository.delete(post);

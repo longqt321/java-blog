@@ -1,8 +1,8 @@
 package org.example.javablog.controller;
 
-import org.apache.coyote.Response;
 import org.example.javablog.dto.ApiResponse;
 import org.example.javablog.dto.UserDTO;
+import org.example.javablog.dto.UserFilterRequest;
 import org.example.javablog.services.PostService;
 import org.example.javablog.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +30,23 @@ public class UserController {
         return userService.getAllUsers();
     }
     @GetMapping("/search")
-    public ResponseEntity<?> searchUsers( @RequestParam(defaultValue = "0") int page,
-                                          @RequestParam(defaultValue = "10") int size){
+    public ResponseEntity<?> searchUsers(
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String fullName,
+            @RequestParam(required = false) String relationshipType,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size){
         try{
+            UserFilterRequest filter = new UserFilterRequest();
+            filter.setUsername(username);
+            filter.setFullName(fullName);
+            filter.setRelationshipType(relationshipType);
+
             Pageable pageable = PageRequest.of(page, size);
             return ResponseEntity.ok().body(new ApiResponse<>(
                     true,
                     "Users retrieved successfully",
-                    userService.searchUsers(pageable)
+                    userService.searchUsers(filter,pageable)
             ));
         }catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(

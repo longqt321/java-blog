@@ -1,10 +1,13 @@
 package org.example.javablog.repository;
 
+import jakarta.annotation.Nullable;
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.model.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,7 +18,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
     Optional<User> findByUsername(String username);
     boolean existsByUsername(String username);
     @Query("SELECT ur.targetUser.id, COUNT(ur) FROM UserRelationship ur " +
@@ -28,7 +31,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "GROUP BY ur.sourceUser.id")
     List<Object[]> countFollowingByUserIds(@Param("userIds") List<Long> userIds);
 
-    Page<User> findByIdNot(Pageable pageable,Long id);
+    Page<User> findByIdNot(@Nullable Specification<User> spec, Pageable pageable, Long id);
 
     boolean existsByEmail(String email);
 }

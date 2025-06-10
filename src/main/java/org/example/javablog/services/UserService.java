@@ -1,14 +1,16 @@
 package org.example.javablog.services;
 
 import org.example.javablog.constant.UserRelationshipType;
+import org.example.javablog.dto.UserFilterRequest;
 import org.example.javablog.model.Image;
-import org.example.javablog.model.Post;
 import org.example.javablog.model.UserRelationship;
-import org.example.javablog.repository.ImageRepository;
 import org.example.javablog.repository.PostRepository;
 import org.example.javablog.repository.UserRelationshipRepository;
+import org.example.javablog.specifications.UserSpecification;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.core.Authentication;
 import org.example.javablog.dto.UserDTO;
 import org.example.javablog.mapper.UserMapper;
@@ -23,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -67,30 +68,28 @@ public class UserService {
 
         return UserMapper.toDTOList(users).stream().map(userDTO -> {
             try {
-                this.enrichUserDTO(userDTO);
+                return this.enrichUserDTO(userDTO);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            return userDTO;
         }).toList();
     }
-    public Page<UserDTO> searchUsers(Pageable pageable){
+    public Page<UserDTO> searchUsers(UserFilterRequest filter, Pageable pageable){
         Long currentUserId = this.getCurrentUser().getId();
-        Page<UserDTO> users = userRepository.findByIdNot(pageable,currentUserId).map(UserMapper::toDTO);
-        users.forEach(userDTO -> {
-            try {
-                this.enrichUserDTO(userDTO);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        return users;
+        Specification<User> spec = UserSpecification.filterBy(filter);
+
+        List<UserDTO> filteredList = userRepository.findAll(spec, pageable)
+                .map(UserMapper::toDTO)
+                .stream()
+                .filter(user -> !user.getId().equals(currentUserId))
+                .filter(user -> !user.getRole().equals(Role.ROLE_ADMIN)) // Exclude admin users
+                .toList();
+        return new PageImpl<>(filteredList, pageable, filteredList.size());
     }
 
     public UserDTO getUserById(Long id) throws IOException {
         UserDTO userDTO = UserMapper.toDTO(Objects.requireNonNull(userRepository.findById(id).orElse(null)));
-        this.enrichUserDTO(userDTO);
-        return userDTO;
+        return this.enrichUserDTO(userDTO);
     }
     public UserDTO getUserByUsername(String username){
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findByUsername(username).orElse(null)));
@@ -106,7 +105,7 @@ public class UserService {
 
         userRepository.delete(user.get());
     }
-    public UserDTO updateUser(Long userId,UserDTO userDTO) {
+    public UserDTO updateUser(Long userId,UserDTO userDTO) throws IOException {
         User updatedUser = userRepository.findById(userId).orElseThrow(NullPointerException::new);
         updatedUser.setLastName(userDTO.getLastName());
         updatedUser.setFirstName(userDTO.getFirstName());
@@ -115,9 +114,9 @@ public class UserService {
         Image avatar = new Image();
         avatar.setId(userDTO.getAvatarId());
         updatedUser.setAvatar(avatar);
-        return UserMapper.toDTO(userRepository.save(updatedUser));
+        return this.enrichUserDTO(UserMapper.toDTO(userRepository.save(updatedUser)));
     }
-    public boolean isAdmin(Long userID){
+    public boolean isAdmin(){
         return this.getCurrentUser().getRole().equals(Role.ROLE_ADMIN);
     }
     public void followUser(Long sourceId,Long targetId){
@@ -175,9 +174,10 @@ public class UserService {
         return UserMapper.toDTO(Objects.requireNonNull(userRepository.findByUsername(username).orElse(null)));
     }
 
-    private void enrichUserDTO(UserDTO userDTO) throws IOException {
+    private UserDTO enrichUserDTO(UserDTO userDTO) throws IOException {
         userDTO.setFollowersCount(userRelationshipRepository.countByTargetUserIdAndUserRelationshipType(userDTO.getId(), UserRelationshipType.FOLLOWING));
         userDTO.setFollowingCount(userRelationshipRepository.countBySourceUserIdAndUserRelationshipType(userDTO.getId(), UserRelationshipType.FOLLOWING));
         userDTO.setPostCount(postRepository.countByAuthorId(userDTO.getId()));
+        return userDTO;
     }
 }
