@@ -6,6 +6,7 @@ import org.example.javablog.dto.PostFilterRequest;
 import org.example.javablog.model.Hashtag;
 import org.example.javablog.model.Post;
 import org.example.javablog.model.PostRelationship;
+import org.example.javablog.model.RecommendScore;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
@@ -100,5 +101,24 @@ public class PostSpecification {
             return root.get("id").in(subquery);
         };
     }
+    public static Specification<Post> sortByRecommendScore(Long userId) {
+        return (root, query, cb) -> {
 
+            // Thêm JOIN thủ công thông qua tên bảng (bằng cách dùng subquery hoặc trực tiếp)
+            assert query != null;
+            Subquery<Double> subquery = query.subquery(Double.class);
+            Root<RecommendScore> recommendRoot = subquery.from(RecommendScore.class);
+            subquery.select(recommendRoot.get("score"));
+            subquery.where(
+                    cb.equal(recommendRoot.get("postId"), root.get("id")),
+                    cb.equal(recommendRoot.get("userId"), userId)
+            );
+
+            // Sắp xếp theo subquery
+            query.orderBy(cb.desc(subquery));
+
+            // Trả về không có filter cụ thể, chỉ sắp xếp
+            return cb.conjunction();
+        };
+    }
 }
