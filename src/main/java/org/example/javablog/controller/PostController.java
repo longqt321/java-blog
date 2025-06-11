@@ -52,7 +52,6 @@ public class PostController {
             filter.setAuthorUsername(username);
 
 
-
             Pageable pageable = PageRequest.of(page, size);
             Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
 

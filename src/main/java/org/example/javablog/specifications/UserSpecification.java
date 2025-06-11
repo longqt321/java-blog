@@ -1,5 +1,6 @@
 package org.example.javablog.specifications;
 
+import org.example.javablog.constant.Role;
 import org.example.javablog.dto.UserFilterRequest;
 import org.example.javablog.model.User;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,6 +10,7 @@ import jakarta.persistence.criteria.*;
 public class UserSpecification {
     public static Specification<User> filterBy(UserFilterRequest filter) {
         Specification<User> spec = Specification.where(null);
+        spec = spec.and(hasRole(String.valueOf(Role.ROLE_USER)));
         if (filter.getUsername() != null && !filter.getUsername().isEmpty()) {
             spec = spec.and(hasUsername(filter.getUsername()));
         }
@@ -35,5 +37,11 @@ public class UserSpecification {
     }
     private static Specification<User> hasRelationship(String relationship) {
         return (root, query, cb) -> cb.equal(cb.lower(root.get("relationship")), relationship.toLowerCase());
+    }
+    private static Specification<User> hasRole(String role) {
+        return (root, query, cb) -> cb.equal(cb.lower(root.get("role")), role.toLowerCase());
+    }
+    public static Specification<User> excludeCurrentUser(Long currentUserId) {
+        return (root, query, cb) -> cb.notEqual(root.get("id"), currentUserId);
     }
 }

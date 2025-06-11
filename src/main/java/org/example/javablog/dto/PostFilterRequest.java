@@ -14,4 +14,5 @@ public class PostFilterRequest {
     private Long userId;
     private Long authorId;
     private String relationshipType;
+    private String sortBy = "createdAt,desc"; // Default sorting
 }

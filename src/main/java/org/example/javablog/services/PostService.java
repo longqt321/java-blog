@@ -12,6 +12,7 @@ import org.example.javablog.model.PostRelationship;
 import org.example.javablog.constant.Visibility;
 import org.example.javablog.repository.PostRelationshipRepository;
 import org.example.javablog.repository.PostRepository;
+import org.example.javablog.repository.RecommendScoreRepository;
 import org.example.javablog.specifications.PostSpecification;
 import org.example.javablog.util.PostUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class PostService {
 
     @Autowired
     private PostRelationshipRepository postRelationshipRepository;
+
+    @Autowired
+    private RecommendScoreRepository recommendScoreRepository;
 
     @Autowired
     private PostUtils postUtils;
@@ -107,9 +111,11 @@ public class PostService {
     public void deletePost(Long postId, Long userId) {
         Post post = blogRepository.findById(postId).orElseThrow(NullPointerException::new);
 
+
         if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin()) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
+        recommendScoreRepository.deleteByPostId(postId);
         blogRepository.delete(post);
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable) throws IOException {
@@ -129,6 +135,7 @@ public class PostService {
                 .and(PostSpecification.excludeByHiddenAndReported(userId))
                 .and(PostSpecification.sortByRecommendScore(userId))
                 .and(PostSpecification.excludeByBlocked(userId));
+
 
         Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
 
@@ -160,7 +167,7 @@ public class PostService {
 
     public void likePost(Long userId,Long postId){
         if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
-            return;
+            throw new IllegalArgumentException("You have already liked this post");
         }
         if (postUtils.validateOwnership(userId,postId)){
             throw new IllegalArgumentException("You cannot like your own posts");
@@ -169,6 +176,9 @@ public class PostService {
     }
     @Transactional
     public void unlikePost(Long userId,Long postId){
+        if (!postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
+            throw new IllegalArgumentException("You have not liked this post yet");
+        }
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.LIKED);
     }
     @Transactional

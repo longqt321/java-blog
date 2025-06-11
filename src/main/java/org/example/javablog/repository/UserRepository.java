@@ -31,7 +31,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
             "GROUP BY ur.sourceUser.id")
     List<Object[]> countFollowingByUserIds(@Param("userIds") List<Long> userIds);
 
-    Page<User> findByIdNot(@Nullable Specification<User> spec, Pageable pageable, Long id);
 
     boolean existsByEmail(String email);
 }

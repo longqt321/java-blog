@@ -68,7 +68,7 @@ public class LoggingAspect {
         } finally {
             logEntry.setDurationMs(System.currentTimeMillis() - start);
             logEntry.setStatusCode(statusCode);
-            userLogRepository.save(logEntry);
+            //userLogRepository.save(logEntry);
         }
 
         return result;

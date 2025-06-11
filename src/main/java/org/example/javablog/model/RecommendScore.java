@@ -23,6 +23,8 @@ public class RecommendScore {
     @Column(name = "post_id")
     private Long postId;
 
+
     @Column(name = "score", precision = 5, scale = 4, nullable = false)
     private BigDecimal score;
+
 }
