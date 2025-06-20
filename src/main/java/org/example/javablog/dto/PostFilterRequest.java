@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class PostFilterRequest {
+    private Long id;
     private String title;
     private List<String> hashtags;
     private String authorName;

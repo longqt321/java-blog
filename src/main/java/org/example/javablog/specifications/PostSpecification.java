@@ -15,6 +15,9 @@ import java.util.List;
 public class PostSpecification {
     public static Specification<Post> filterBy(PostFilterRequest filter){
         Specification<Post> spec = Specification.where(null);
+        if (filter.getId() != null && filter.getId() > 0) {
+            spec = spec.and(hasId(filter.getId()));
+        }
         if (filter.getTitle() != null && !filter.getTitle().isEmpty()) {
             spec = spec.and(hasTitle(filter.getTitle()));
         }
@@ -39,6 +42,14 @@ public class PostSpecification {
 
 
         return spec;
+    }
+    private static Specification<Post> hasId(Long id) {
+        return (root, query, cb) -> {
+            if (id == null) {
+                return cb.conjunction(); // stop lọc
+            }
+            return cb.equal(root.get("id"), id);
+        };
     }
     private static Specification<Post> hasHashtags(List<String> hashtags) {
         return (root, query, cb) -> {

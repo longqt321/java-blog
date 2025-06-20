@@ -29,6 +29,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<?> getPosts(
+            @RequestParam(required = false) Long id,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) List<String> hashtags,
             @RequestParam(required = false) String author,
@@ -38,12 +39,11 @@ public class PostController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String relationshipType,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "createdAt,desc") String sortBy,
-            Sort sort) {
+            @RequestParam(defaultValue = "10") int size) {
 
         try{
             PostFilterRequest filter = new PostFilterRequest();
+            filter.setId(id);
             filter.setTitle(title);
             filter.setHashtags(hashtags);
             filter.setAuthorName(author);
@@ -55,12 +55,7 @@ public class PostController {
 
 
 
-            String prop = sortBy.split(",")[0];
-            String direction = sortBy.split(",")[1];
-
-            Sort sorter = Sort.by(new Sort.Order(Sort.Direction.fromString(direction), prop));
-
-            Pageable pageable = PageRequest.of(page, size, sorter);
+            Pageable pageable = PageRequest.of(page, size);
             Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
 
 

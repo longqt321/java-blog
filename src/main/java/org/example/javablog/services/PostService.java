@@ -165,18 +165,12 @@ public class PostService {
 
     public void likePost(Long userId,Long postId){
         if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
-            throw new IllegalArgumentException("You have already liked this post");
-        }
-        if (postUtils.validateOwnership(userId,postId)){
-            throw new IllegalArgumentException("You cannot like your own posts");
+            return;
         }
         postRelationshipRepository.save(PostRelationship.fromIds(userId, postId, PostRelationshipType.LIKED));
     }
     @Transactional
     public void unlikePost(Long userId,Long postId){
-        if (!postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
-            throw new IllegalArgumentException("You have not liked this post yet");
-        }
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.LIKED);
     }
     @Transactional
