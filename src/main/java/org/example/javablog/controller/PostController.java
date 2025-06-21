@@ -39,7 +39,9 @@ public class PostController {
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String relationshipType,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sortBy
+    ) {
 
         try{
             PostFilterRequest filter = new PostFilterRequest();
@@ -53,12 +55,12 @@ public class PostController {
             filter.setRelationshipType(relationshipType);
             filter.setAuthorUsername(username);
 
+            String[] sortParams = sortBy.split(",");
+            Sort sort = Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]);
 
 
-            Pageable pageable = PageRequest.of(page, size);
+            Pageable pageable = PageRequest.of(page, size,sort);
             Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
-
-
 
             PageResponse<PostDTO> pageResponse = new PageResponse<>(postPage.getContent(),
                     postPage.getNumber(),
