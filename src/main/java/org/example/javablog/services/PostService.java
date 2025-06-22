@@ -133,7 +133,8 @@ public class PostService {
 
         Specification<Post> spec = Specification.where(PostSpecification.filterBy(filter));
         if (filter.isExcludeHidden()) {
-            spec = spec.and(PostSpecification.excludeHidden(userId));
+            spec = spec.and(PostSpecification.excludeHidden(userId))
+                    .and(PostSpecification.excludeBlockedUsers(userId));
         }
 //                .and(PostSpecification.sortByRecommendScore(userId));
 

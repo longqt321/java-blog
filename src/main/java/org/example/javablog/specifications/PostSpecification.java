@@ -2,11 +2,9 @@ package org.example.javablog.specifications;
 
 import jakarta.persistence.criteria.*;
 import org.example.javablog.constant.PostRelationshipType;
+import org.example.javablog.constant.UserRelationshipType;
 import org.example.javablog.dto.PostFilterRequest;
-import org.example.javablog.model.Hashtag;
-import org.example.javablog.model.Post;
-import org.example.javablog.model.PostRelationship;
-import org.example.javablog.model.RecommendScore;
+import org.example.javablog.model.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 
@@ -146,6 +144,21 @@ public class PostSpecification {
 
             // Điều kiện: post.id KHÔNG nằm trong subquery
             return cb.not(root.get("id").in(subquery));
+        };
+    }
+    public static Specification<Post> excludeBlockedUsers(Long userId) {
+        return (root, query, cb) -> {
+            // Subquery: các authorId mà userId đã block
+            assert query != null;
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<UserRelationship> relRoot = subquery.from(UserRelationship.class);
+            subquery.select(relRoot.get("targetUser").get("id"))
+                    .where(
+                            cb.equal(relRoot.get("sourceUser").get("id"), userId),
+                            cb.equal(relRoot.get("userRelationshipType"), UserRelationshipType.BLOCKING)
+                    );
+            // post.author.id KHÔNG nằm trong subquery
+            return cb.not(root.get("author").get("id").in(subquery));
         };
     }
 
