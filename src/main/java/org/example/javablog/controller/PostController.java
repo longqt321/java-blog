@@ -38,6 +38,7 @@ public class PostController {
             @RequestParam(required = false) Long authorId,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String relationshipType,
+            @RequestParam(required = false) Boolean excludeHidden,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt,desc") String sortBy
@@ -53,6 +54,7 @@ public class PostController {
             filter.setAuthorId(authorId);
             filter.setVisibility(visibility);
             filter.setRelationshipType(relationshipType);
+            filter.setExcludeHidden(excludeHidden != null ? excludeHidden : true);
             filter.setAuthorUsername(username);
 
             String[] sortParams = sortBy.split(",");

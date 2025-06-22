@@ -15,4 +15,5 @@ public class PostFilterRequest {
     private Long userId;
     private Long authorId;
     private String relationshipType;
+    private boolean excludeHidden = true;
 }

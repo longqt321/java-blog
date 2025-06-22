@@ -132,4 +132,21 @@ public class PostSpecification {
             return cb.conjunction();
         };
     }
+    public static Specification<Post> excludeHidden(Long userId) {
+        return (root, query, cb) -> {
+            // Tạo subquery để lấy các postId bị hidden/report bởi user
+            assert query != null;
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<PostRelationship> relRoot = subquery.from(PostRelationship.class);
+            subquery.select(relRoot.get("post").get("id"))
+                    .where(
+                            cb.equal(relRoot.get("user").get("id"), userId),
+                            relRoot.get("postRelationshipType").in(PostRelationshipType.HIDDEN, PostRelationshipType.REPORTED)
+                    );
+
+            // Điều kiện: post.id KHÔNG nằm trong subquery
+            return cb.not(root.get("id").in(subquery));
+        };
+    }
+
 }

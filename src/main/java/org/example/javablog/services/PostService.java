@@ -55,28 +55,28 @@ public class PostService {
         List<PostDTO> posts = blogRepository.findAll().stream()
                 .map(PostMapper::toDTO)
                 .collect(Collectors.toList());
-        List<Long> postIds = posts.stream()
-                .map(PostDTO::getId)
-                .toList();
-
-        List<PostRelationship> postRelationships = postRelationshipRepository.findByUserIdAndPostIdIn(userService.getCurrentUser().getId(),postIds);
-
-        Map<Long, PostRelationshipDTO> relMap = postRelationships.stream()
-                .collect(Collectors.groupingBy(
-                        pr -> pr.getPost().getId(),
-                        Collectors.collectingAndThen(
-                                Collectors.mapping(PostRelationship::getPostRelationshipType, Collectors.toSet()),
-                                set -> new PostRelationshipDTO(
-                                        set.contains(PostRelationshipType.LIKED),
-                                        set.contains(PostRelationshipType.SAVED),
-                                        set.contains(PostRelationshipType.HIDDEN),
-                                        set.contains(PostRelationshipType.REPORTED)
-                                )
-                        )));
-
-        posts.forEach(dto -> {
-            dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
-        });
+//        List<Long> postIds = posts.stream()
+//                .map(PostDTO::getId)
+//                .toList();
+//
+//        List<PostRelationship> postRelationships = postRelationshipRepository.findByUserIdAndPostIdIn(userService.getCurrentUser().getId(),postIds);
+//
+//        Map<Long, PostRelationshipDTO> relMap = postRelationships.stream()
+//                .collect(Collectors.groupingBy(
+//                        pr -> pr.getPost().getId(),
+//                        Collectors.collectingAndThen(
+//                                Collectors.mapping(PostRelationship::getPostRelationshipType, Collectors.toSet()),
+//                                set -> new PostRelationshipDTO(
+//                                        set.contains(PostRelationshipType.LIKED),
+//                                        set.contains(PostRelationshipType.SAVED),
+//                                        set.contains(PostRelationshipType.HIDDEN),
+//                                        set.contains(PostRelationshipType.REPORTED)
+//                                )
+//                        )));
+//
+//        posts.forEach(dto -> {
+//            dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
+//        });
         return posts;
     }
 
@@ -131,8 +131,11 @@ public class PostService {
         }
 
 
-        Specification<Post> spec = Specification.where(PostSpecification.filterBy(filter))
-                .and(PostSpecification.sortByRecommendScore(userId));
+        Specification<Post> spec = Specification.where(PostSpecification.filterBy(filter));
+        if (filter.isExcludeHidden()) {
+            spec = spec.and(PostSpecification.excludeHidden(userId));
+        }
+//                .and(PostSpecification.sortByRecommendScore(userId));
 
 
         Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
