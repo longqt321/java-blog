@@ -75,16 +75,10 @@ public class UserService {
         }).toList();
     }
     public Page<UserDTO> searchUsers(UserFilterRequest filter, Pageable pageable){
-        Long currentUserId = this.getCurrentUser().getId();
         Specification<User> spec = UserSpecification.filterBy(filter);
 
-        List<UserDTO> filteredList = userRepository.findAll(spec, pageable)
-                .map(UserMapper::toDTO)
-                .stream()
-                .filter(user -> !user.getId().equals(currentUserId))
-                .filter(user -> !user.getRole().equals(Role.ROLE_ADMIN)) // Exclude admin users
-                .toList();
-        return new PageImpl<>(filteredList, pageable, filteredList.size());
+        return userRepository.findAll(spec, pageable)
+                .map(UserMapper::toDTO);
     }
 
     public UserDTO getUserById(Long id) throws IOException {

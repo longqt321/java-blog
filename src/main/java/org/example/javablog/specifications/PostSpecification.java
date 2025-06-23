@@ -38,9 +38,9 @@ public class PostSpecification {
             spec = spec.and(hasAuthorUsername(filter.getAuthorUsername()));
         }
 
-
         return spec;
     }
+
     private static Specification<Post> hasId(Long id) {
         return (root, query, cb) -> {
             if (id == null) {

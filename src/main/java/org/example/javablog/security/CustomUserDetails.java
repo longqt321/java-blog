@@ -2,6 +2,8 @@ package org.example.javablog.security;
 
 import lombok.Getter;
 import org.example.javablog.model.User;
+import org.example.javablog.dto.UserDTO;
+import org.example.javablog.mapper.UserMapper;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +31,9 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public String getUsername() {
         return user.getUsername();
+    }
+    public UserDTO getUser() {
+        return UserMapper.toDTO(user);
     }
 
     public Long getId() {
