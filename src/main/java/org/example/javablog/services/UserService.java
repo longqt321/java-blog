@@ -75,11 +75,9 @@ public class UserService {
         }).toList();
     }
     public Page<UserDTO> searchUsers(UserFilterRequest filter, Pageable pageable){
-        Long currentUserId = this.getCurrentUser().getId();
-        Specification<User> spec = UserSpecification.filterBy(filter)
-                .and(UserSpecification.excludeCurrentUser(currentUserId));
+        Specification<User> spec = UserSpecification.filterBy(filter);
 
-        return userRepository.findAll(spec,pageable)
+        return userRepository.findAll(spec, pageable)
                 .map(UserMapper::toDTO);
     }
 

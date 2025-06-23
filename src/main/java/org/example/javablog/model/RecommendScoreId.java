@@ -1,4 +1,4 @@
-package org.example.javablog.models;
+package org.example.javablog.model;
 
 import lombok.*;
 

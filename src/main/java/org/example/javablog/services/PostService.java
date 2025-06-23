@@ -43,8 +43,8 @@ public class PostService {
     @Autowired
     private PostRelationshipRepository postRelationshipRepository;
 
-    @Autowired
-    private RecommendScoreRepository recommendScoreRepository;
+    //@Autowired
+    //private RecommendScoreRepository recommendScoreRepository;
 
     @Autowired
     private PostUtils postUtils;
@@ -55,28 +55,28 @@ public class PostService {
         List<PostDTO> posts = blogRepository.findAll().stream()
                 .map(PostMapper::toDTO)
                 .collect(Collectors.toList());
-        List<Long> postIds = posts.stream()
-                .map(PostDTO::getId)
-                .toList();
-
-        List<PostRelationship> postRelationships = postRelationshipRepository.findByUserIdAndPostIdIn(userService.getCurrentUser().getId(),postIds);
-
-        Map<Long, PostRelationshipDTO> relMap = postRelationships.stream()
-                .collect(Collectors.groupingBy(
-                        pr -> pr.getPost().getId(),
-                        Collectors.collectingAndThen(
-                                Collectors.mapping(PostRelationship::getPostRelationshipType, Collectors.toSet()),
-                                set -> new PostRelationshipDTO(
-                                        set.contains(PostRelationshipType.LIKED),
-                                        set.contains(PostRelationshipType.SAVED),
-                                        set.contains(PostRelationshipType.HIDDEN),
-                                        set.contains(PostRelationshipType.REPORTED)
-                                )
-                        )));
-
-        posts.forEach(dto -> {
-            dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
-        });
+//        List<Long> postIds = posts.stream()
+//                .map(PostDTO::getId)
+//                .toList();
+//
+//        List<PostRelationship> postRelationships = postRelationshipRepository.findByUserIdAndPostIdIn(userService.getCurrentUser().getId(),postIds);
+//
+//        Map<Long, PostRelationshipDTO> relMap = postRelationships.stream()
+//                .collect(Collectors.groupingBy(
+//                        pr -> pr.getPost().getId(),
+//                        Collectors.collectingAndThen(
+//                                Collectors.mapping(PostRelationship::getPostRelationshipType, Collectors.toSet()),
+//                                set -> new PostRelationshipDTO(
+//                                        set.contains(PostRelationshipType.LIKED),
+//                                        set.contains(PostRelationshipType.SAVED),
+//                                        set.contains(PostRelationshipType.HIDDEN),
+//                                        set.contains(PostRelationshipType.REPORTED)
+//                                )
+//                        )));
+//
+//        posts.forEach(dto -> {
+//            dto.setRelationship(relMap.getOrDefault(dto.getId(), new PostRelationshipDTO(false,false,false,false)));
+//        });
         return posts;
     }
 
@@ -115,7 +115,7 @@ public class PostService {
         if (!post.getAuthor().getId().equals(userId) && !userService.isAdmin()) {
             throw new SecurityException("User is not authorized to delete this post.");
         }
-        recommendScoreRepository.deleteByPostId(postId);
+        //recommendScoreRepository.deleteByPostId(postId);
         blogRepository.delete(post);
     }
     public Page<PostDTO> searchPosts(PostFilterRequest filter, Pageable pageable) throws IOException {
@@ -131,10 +131,12 @@ public class PostService {
         }
 
 
-        Specification<Post> spec = Specification.where(PostSpecification.filterBy(filter))
-                .and(PostSpecification.excludeByHiddenAndReported(userId))
-                .and(PostSpecification.sortByRecommendScore(userId))
-                .and(PostSpecification.excludeByBlocked(userId));
+        Specification<Post> spec = Specification.where(PostSpecification.filterBy(filter));
+        if (filter.isExcludeHidden()) {
+            spec = spec.and(PostSpecification.excludeHidden(userId))
+                    .and(PostSpecification.excludeBlockedUsers(userId));
+        }
+//                .and(PostSpecification.sortByRecommendScore(userId));
 
 
         Page<PostDTO> posts = postRepository.findAll(spec,pageable).map(PostMapper::toDTO);
@@ -167,18 +169,12 @@ public class PostService {
 
     public void likePost(Long userId,Long postId){
         if (postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
-            throw new IllegalArgumentException("You have already liked this post");
-        }
-        if (postUtils.validateOwnership(userId,postId)){
-            throw new IllegalArgumentException("You cannot like your own posts");
+            return;
         }
         postRelationshipRepository.save(PostRelationship.fromIds(userId, postId, PostRelationshipType.LIKED));
     }
     @Transactional
     public void unlikePost(Long userId,Long postId){
-        if (!postUtils.existsByRelationship(userId,postId,PostRelationshipType.LIKED)){
-            throw new IllegalArgumentException("You have not liked this post yet");
-        }
         postRelationshipRepository.deleteByUserIdAndPostIdAndPostRelationshipType(userId,postId,PostRelationshipType.LIKED);
     }
     @Transactional

@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class PostFilterRequest {
+    private Long id;
     private String title;
     private List<String> hashtags;
     private String authorName;
@@ -14,5 +15,5 @@ public class PostFilterRequest {
     private Long userId;
     private Long authorId;
     private String relationshipType;
-    private String sortBy = "createdAt,desc"; // Default sorting
+    private boolean excludeHidden = true;
 }

@@ -69,10 +69,14 @@ public class UserController {
 //        }
 //    }
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> getUserById(@PathVariable Long id){
+    public ResponseEntity<?> getUserById(@PathVariable Long id){
         try{
             UserDTO user = userService.getUserById(id);
-            return ResponseEntity.ok(user);
+            return ResponseEntity.ok().body(new ApiResponse<>(
+                    true,
+                    "Users retrieved successfully",
+                    user
+            ));
         }catch(NullPointerException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } catch (IOException e) {

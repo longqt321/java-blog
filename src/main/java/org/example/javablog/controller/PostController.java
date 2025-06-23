@@ -29,6 +29,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<?> getPosts(
+            @RequestParam(required = false) Long id,
             @RequestParam(required = false) String title,
             @RequestParam(required = false) List<String> hashtags,
             @RequestParam(required = false) String author,
@@ -37,11 +38,15 @@ public class PostController {
             @RequestParam(required = false) Long authorId,
             @RequestParam(required = false) Long userId,
             @RequestParam(required = false) String relationshipType,
+            @RequestParam(required = false) Boolean excludeHidden,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        System.out.println("TEST!!!");
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "createdAt,desc") String sortBy
+    ) {
+
         try{
             PostFilterRequest filter = new PostFilterRequest();
+            filter.setId(id);
             filter.setTitle(title);
             filter.setHashtags(hashtags);
             filter.setAuthorName(author);
@@ -49,13 +54,15 @@ public class PostController {
             filter.setAuthorId(authorId);
             filter.setVisibility(visibility);
             filter.setRelationshipType(relationshipType);
+            filter.setExcludeHidden(excludeHidden != null ? excludeHidden : true);
             filter.setAuthorUsername(username);
 
+            String[] sortParams = sortBy.split(",");
+            Sort sort = Sort.by(Sort.Direction.fromString(sortParams[1]), sortParams[0]);
 
-            Pageable pageable = PageRequest.of(page, size);
+
+            Pageable pageable = PageRequest.of(page, size,sort);
             Page<PostDTO> postPage = postService.searchPosts(filter, pageable);
-
-
 
             PageResponse<PostDTO> pageResponse = new PageResponse<>(postPage.getContent(),
                     postPage.getNumber(),

@@ -4,11 +4,10 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import org.example.javablog.models.RecommendScoreId;
 
 @Entity
 @Table(name = "recommend_score")
-@IdClass(RecommendScore.class)
+@IdClass(RecommendScoreId.class)
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,8 +22,6 @@ public class RecommendScore {
     @Column(name = "post_id")
     private Long postId;
 
-
     @Column(name = "score", precision = 5, scale = 4, nullable = false)
     private BigDecimal score;
-
 }
